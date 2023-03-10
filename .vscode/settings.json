@@ -1,0 +1,99 @@
+{
+  "terminal.integrated.cursorStyle": "line",
+  "workbench.colorCustomizations": {
+    "terminal.background": "#1D1F21",
+    "terminal.foreground": "#C5C8C6",
+    "terminalCursor.background": "#C5C8C6",
+    "terminalCursor.foreground": "#C5C8C6",
+    "terminal.ansiBlack": "#1D1F21",
+    "terminal.ansiBlue": "#81A2BE",
+    "terminal.ansiBrightBlack": "#969896",
+    "terminal.ansiBrightBlue": "#81A2BE",
+    "terminal.ansiBrightCyan": "#8ABEB7",
+    "terminal.ansiBrightGreen": "#B5BD68",
+    "terminal.ansiBrightMagenta": "#B294BB",
+    "terminal.ansiBrightRed": "#CC6666",
+    "terminal.ansiBrightWhite": "#FFFFFF",
+    "terminal.ansiBrightYellow": "#F0C674",
+    "terminal.ansiCyan": "#8ABEB7",
+    "terminal.ansiGreen": "#B5BD68",
+    "terminal.ansiMagenta": "#B294BB",
+    "terminal.ansiRed": "#CC6666",
+    "terminal.ansiWhite": "#C5C8C6",
+    "terminal.ansiYellow": "#F0C674"
+  },
+  "editor.semanticHighlighting.enabled": true,
+  "[handlebars]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "prettier.vueIndentScriptAndStyle": true,
+  "editor.smoothScrolling": true,
+  "workbench.list.smoothScrolling": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.tabWidth": 2,
+  "editor.mouseWheelScrollSensitivity": 0.2,
+  "workbench.list.mouseWheelScrollSensitivity": 0.2,
+  "terminal.integrated.mouseWheelScrollSensitivity": 0.2,
+  "editor.wordWrap": "on",
+  "editor.detectIndentation": false,
+  "editor.formatOnSaveMode": "modifications",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "explorer.confirmDragAndDrop": false,
+  "window.title": "${activeEditorLong}${separator}${rootName}",
+  "files.watcherExclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/dist-*": true,
+    "**/tmp": true,
+    "**/i18n": true,
+    "**/config": true,
+    "**/.gradle": true,
+    "**/.eyeglass_cache": true,
+    "storybook-static": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.yarn": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/dist-*": true,
+    "**/tmp": true,
+    "**/i18n": true,
+    "**/.gradle": true,
+    "**/.eyeglass_cache": true,
+    "**/_build": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "workbench.startupEditor": "none",
+  "files.associations": {
+    "*.hbs": "handlebars"
+  },
+  "window.commandCenter": false,
+  "terminal.integrated.cursorBlinking": true,
+  "editor.fontLigatures": true,
+  "editor.fontFamily": "FiraCode-Retina, Menlo, Monaco, 'Courier New', monospace",
+  "files.trimTrailingWhitespace": true,
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "boundary",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "git.autofetch": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  }
+}

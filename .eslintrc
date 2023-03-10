@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "extends": [
+    "plugin:unicorn/recommended",
+    "eslint:recommended",
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "plugins": ["unicorn", "import", "prettier", "node"],
+  "settings": {},
+  "rules": {
+    // Mainly to make sure that the imports will always resolve
+    "import/no-unresolved": [2, { "caseSensitive": true }],
+    //These three are kind of annoying so turned them off
+    "unicorn/no-null": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "unicorn/consistent-destructuring": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "unicorn/no-array-method-this-argument": "off",
+    //Mainly for consistent filenames
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          // See here for more case options: https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/filename-case.md#cases
+          "camelCase": true
+        }
+      }
+    ],
+    // Other useful stuff
+    "node/no-process-env": "error",
+    "prefer-destructuring": ["error", { "object": true, "array": false }],
+    "prefer-template": "error",
+    "prefer-const": "error",
+    "require-atomic-updates": "error",
+    "no-return-await": "error"
+  }
+}
