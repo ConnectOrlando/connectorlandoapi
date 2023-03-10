@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//define our data
+model User {
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String
+  email           String
+  isEmailVerified Boolean       @default(false)
+  password        String
+  profileImage    String?
+  bio             String?
+  isInvestor      Boolean       @default(false)
+  investorSpecialization String?
+  connections     InvestorConnection[]
+  favorites       Business[] @relation(fields: [favoriteId], references: [id])
+  favoriteId      String @unique
+  companies       Business[] @relation(fields: [companyId], references: [id])
+  companyId      String @unique
+  phone           String?
+  location        Json          @default("{}")
+  isPhoneVerified Boolean       @default(false)
+  linkedin        String?
+  instagram       String?
+  facebook        String?
+  twitter         String?
+  title           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  isArchived      Boolean       @default(true)
+  archivedAt      DateTime?
+}
+
+//Business
+model Business {
+  id              String               @id @default(uuid()) @db.Uuid
+  name            String
+  type            BusinessType //pablo - think about this more
+  mission         String
+  gallery         String[]
+  servicesOffered String?
+  capital         Int?
+  employees       Int?
+  bio             String
+  location        Json                 @default("{}")
+  //need to know which investors have connected 
+  investors       InvestorConnection[]
+}
+
+enum BusinessType {
+  TECHNOLOGY
+  FINANCE
+}
+
+model InvestorConnection {
+  business       Business     @relation(fields: [businessId], references: [id])
+  businessId     String
+  connectedOn    DateTime     @default(now())
+  User   User @relation(fields: [userId], references: [id])
+  userId String       @db.Uuid
+
+  @@id([userId, businessId])
+}
