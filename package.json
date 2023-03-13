@@ -11,7 +11,8 @@
     "debug": "node --inspect-brk server.js",
     "lint": "eslint --ext=.js --ignore-path=.gitignore src",
     "lint:fix": "yarn run lint --fix",
-    "format": "prettier --write --ignore-path=.gitignore \"src/**/*.{js,jsx}\""
+    "format": "prettier --write --ignore-path=.gitignore \"src/**/*.{js,jsx}\"",
+    "prisma": "npx prisma db push && npx prisma db seed && npx prisma studio"
   },
   "author": "Laura Boettcher, Pablo Najera",
   "license": "ISC",
@@ -43,6 +44,9 @@
     "prettier": "2.8.0",
     "prisma": "^4.11.0",
     "simple-git-hooks": "2.8.1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed/index.js"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",

@@ -22,7 +22,7 @@ model User {
   isInvestor             Boolean              @default(false)
   investorSpecialization String?
   companies              Business[]           @relation("owner")
-  favorites              Business[]           @relation("favoritedBy")
+  favorites              Business[]
   connections            InvestorConnection[]
   phone                  String?
   location               Json                 @default("{}")
@@ -52,8 +52,7 @@ model Business {
   location        Json                 @default("{}")
   owner           User                 @relation(fields: [ownerId], references: [id], name: "owner")
   ownerId         String @db.Uuid
-  favoritedBy     User                 @relation(fields: [favoritedById], references: [id], name: "favoritedBy")
-  favoritedById   String @db.Uuid
+  favoritedBy     User[]
   connections     InvestorConnection[]
 }
 
@@ -65,7 +64,7 @@ enum BusinessType {
 model InvestorConnection {
   business    Business @relation(fields: [businessId], references: [id])
   businessId  String @db.Uuid
-  User        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
   userId      String @db.Uuid
   connectedOn DateTime @default(now())
 
