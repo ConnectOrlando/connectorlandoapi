@@ -14,6 +14,7 @@ export default router
           'Must provide a valid name, email, and password'
         );
       }
+      // TODO: Check if email already exists in db. if, so return error
       const passwordHash = await bcrypt.hash(request.body.password, 10);
       const user = await Prisma.user.create({
         data: {
@@ -38,6 +39,8 @@ export default router
           id: request.params.id,
         },
       });
+      // TODO: Check if user is archived. if so, return an error
+      // TODO: Don't return all fields (exclude for example, password, isArchived)
       response.json({
         user,
       });
@@ -55,6 +58,7 @@ export default router
         where: {
           id: request.params.id,
         },
+        // TODO: be selective about which fields can be updated
         data: request.body,
       });
       response.json({
@@ -70,6 +74,7 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
+      // non blocking - send notes about async/await
       await Prisma.user.update({
         where: {
           id: request.params.id,
