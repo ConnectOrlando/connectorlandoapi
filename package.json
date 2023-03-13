@@ -16,24 +16,25 @@
   "author": "Laura Boettcher, Pablo Najera",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@prisma/client": "^4.11.0",
-    "helmet": "^6.0.1",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "helmet": "^6.0.1"
   },
   "devDependencies": {
     "eslint": "^8.33.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-no-floating-promise": "^1.0.2",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-unicorn": "^45.0.2",
-    "eslint-plugin-no-floating-promise": "^1.0.2",
     "lint-staged": "^13.1.1",
     "nodemon": "^2.0.20",
     "prettier": "2.8.0",

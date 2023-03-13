@@ -12,39 +12,37 @@ datasource db {
 
 //define our data
 model User {
-  id              String        @id @default(uuid()) @db.Uuid
-  name            String
-  email           String
-  isEmailVerified Boolean       @default(false)
-  password        String
-  profileImage    String?
-  bio             String?
-  isInvestor      Boolean       @default(false)
+  id                     String               @id @default(uuid()) @db.Uuid
+  name                   String
+  email                  String
+  isEmailVerified        Boolean              @default(false)
+  password               String
+  profileImage           String?
+  bio                    String?
+  isInvestor             Boolean              @default(false)
   investorSpecialization String?
-  connections     InvestorConnection[]
-  favorites       Business[] @relation(fields: [favoriteId], references: [id])
-  favoriteId      String @unique
-  companies       Business[] @relation(fields: [companyId], references: [id])
-  companyId      String @unique
-  phone           String?
-  location        Json          @default("{}")
-  isPhoneVerified Boolean       @default(false)
-  linkedin        String?
-  instagram       String?
-  facebook        String?
-  twitter         String?
-  title           String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @default(now()) @updatedAt
-  isArchived      Boolean       @default(true)
-  archivedAt      DateTime?
+  companies              Business[]           @relation("owner")
+  favorites              Business[]           @relation("favoritedBy")
+  connections            InvestorConnection[]
+  phone                  String?
+  location               Json                 @default("{}")
+  isPhoneVerified        Boolean              @default(false)
+  linkedin               String?
+  instagram              String?
+  facebook               String?
+  twitter                String?
+  title                  String?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @default(now()) @updatedAt
+  isArchived             Boolean              @default(true)
+  archivedAt             DateTime?
 }
 
 //Business
 model Business {
   id              String               @id @default(uuid()) @db.Uuid
   name            String
-  type            BusinessType //pablo - think about this more
+  type            BusinessType //TODO - pablo - think about this more
   mission         String
   gallery         String[]
   servicesOffered String?
@@ -52,8 +50,11 @@ model Business {
   employees       Int?
   bio             String
   location        Json                 @default("{}")
-  //need to know which investors have connected 
-  investors       InvestorConnection[]
+  owner           User                 @relation(fields: [ownerId], references: [id], name: "owner")
+  ownerId         String @db.Uuid
+  favoritedBy     User                 @relation(fields: [favoritedById], references: [id], name: "favoritedBy")
+  favoritedById   String @db.Uuid
+  connections     InvestorConnection[]
 }
 
 enum BusinessType {
@@ -62,11 +63,11 @@ enum BusinessType {
 }
 
 model InvestorConnection {
-  business       Business     @relation(fields: [businessId], references: [id])
-  businessId     String
-  connectedOn    DateTime     @default(now())
-  User   User @relation(fields: [userId], references: [id])
-  userId String       @db.Uuid
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  String @db.Uuid
+  User        User     @relation(fields: [userId], references: [id])
+  userId      String @db.Uuid
+  connectedOn DateTime @default(now())
 
   @@id([userId, businessId])
 }
