@@ -91,9 +91,6 @@ function getRandomBoolean() {
   return getRandomNumber(0, 10) % 2 === 0;
 }
 
-/**
- * Returns a random number between min (inclusive) and max (exclusive)
- */
 function getRandomNumber(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
