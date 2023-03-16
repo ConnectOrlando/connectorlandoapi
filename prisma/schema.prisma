@@ -14,7 +14,7 @@ datasource db {
 model User {
   id                     String               @id @default(uuid()) @db.Uuid
   name                   String
-  email                  String
+  email                  String               @unique
   isEmailVerified        Boolean              @default(false)
   password               String
   profileImage           String?
@@ -34,7 +34,7 @@ model User {
   title                  String?
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @default(now()) @updatedAt
-  isArchived             Boolean              @default(true)
+  isArchived             Boolean              @default(false)
   archivedAt             DateTime?
 }
 
@@ -54,6 +54,8 @@ model Business {
   ownerId         String @db.Uuid
   favoritedBy     User[]
   connections     InvestorConnection[]
+  isArchived             Boolean              @default(false)
+  archivedAt             DateTime?
 }
 
 enum BusinessType {
