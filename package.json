@@ -7,7 +7,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon -w .env -w . server.js",
+    "dev": "yarn && nodemon -w .env -w . server.js",
     "debug": "node --inspect-brk server.js",
     "lint": "eslint --ext=.js --ignore-path=.gitignore src",
     "lint:fix": "yarn run lint --fix",
@@ -52,7 +52,8 @@
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
-    "pre-push": "yarn run format"
+    "pre-push": "yarn run format",
+    "post-merge": "yarn && npx prisma db push"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --fix"
