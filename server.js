@@ -1,6 +1,6 @@
 import app from './src/app.js';
 import Logger from './src/tools/logger.js';
-import { config } from 'dotenv';
+import config from './src/config.js';
 
 app.listen(config.PORT || 3001, () => {
   Logger.info(

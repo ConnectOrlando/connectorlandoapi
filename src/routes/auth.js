@@ -40,7 +40,7 @@ export default router
         },
         '1w'
       );
-      response.json(accessToken);
+      response.json({ accessToken });
     } catch (error) {
       next(error);
     }

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from 'dotenv';
+import config from '../config.js';
 
 /**
  * Wrapper for jsonwebtoken sign function. Takes care of privateKey

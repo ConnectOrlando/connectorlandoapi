@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+import config from '../config.js';
 import winston from 'winston';
 
 const { combine, timestamp, colorize, printf } = winston.format;
