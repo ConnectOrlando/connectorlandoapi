@@ -12,10 +12,8 @@ const router = express.Router();
 export default router
   .post('/signup', async (request, response, next) => {
     try {
-      if (!request.body.name || !request.body.email || !request.body.password) {
-        throw new RequestError(
-          'Must provide a valid name, email, and password'
-        );
+      if (!request.body.email || !request.body.password) {
+        throw new RequestError('Must provide a valid  email, and password');
       }
       const user = await Prisma.user.findUnique({
         where: {
@@ -28,7 +26,6 @@ export default router
       const passwordHash = await bcrypt.hash(request.body.password, 10);
       const newUser = await Prisma.user.create({
         data: {
-          name: request.body.name,
           email: request.body.email.toLowerCase(),
           password: passwordHash,
         },
