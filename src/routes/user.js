@@ -40,7 +40,13 @@ export default router
   // read by the token id
   .get('/', async (request, response, next) => {
     try {
-      // how to get the token request? - request.headers.auth
+      // how to get the token request? -
+      //     request.header.authorization has your token
+      //       but it is structured like "Bearer YOUR_TOKEN"
+      //       so parse split the string by " " (space)
+      //       which results in ["Bearer", "YOUR_TOKEN"]
+      //       so your token is the 1st index
+      // const token = request.headers.authorization.split(' ')[1];
       // verify the token (jwt.verify)
       // const payload = await jwt.verify(myToken);
       // payload.id = user's id
