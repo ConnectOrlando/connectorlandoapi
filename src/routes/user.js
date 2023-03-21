@@ -37,6 +37,20 @@ export default router
       next(error);
     }
   })
+  // read by the token id
+  .get('/', async (request, response, next) => {
+    try {
+      // how to get the token request? - request.headers.auth
+      // verify the token (jwt.verify)
+      // const payload = await jwt.verify(myToken);
+      // payload.id = user's id
+      // retrieve the user with that id
+      // return the user info
+      response.json({ message: 'changeMe' });
+    } catch (error) {
+      next(error);
+    }
+  })
   // read
   .get('/:id', async (request, response, next) => {
     try {
