@@ -1,11 +1,11 @@
-import express from 'express';
 import {
   AuthenticationError,
   RequestError,
 } from '../constants/commonErrors.js';
-import Prisma from '../tools/prisma.js';
 import bcrypt from 'bcrypt';
+import express from 'express';
 import jwt from '../tools/jwt.js';
+import Prisma from '../tools/prisma.js';
 
 const router = express.Router();
 

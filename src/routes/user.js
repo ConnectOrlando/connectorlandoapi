@@ -1,8 +1,8 @@
-import express from 'express';
-import { ArchivedError, RequestError } from '../constants/commonErrors.js';
-import Prisma from '../tools/prisma.js';
-import bcrypt from 'bcrypt';
 import _ from 'lodash-es';
+import { ArchivedError, RequestError } from '../constants/commonErrors.js';
+import bcrypt from 'bcrypt';
+import express from 'express';
+import Prisma from '../tools/prisma.js';
 
 const router = express.Router();
 
