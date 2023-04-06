@@ -37,11 +37,20 @@ export default router
         },
         '1w'
       );
+      // TODO: also, create a refreshToken and return to user
+      // first - create new database (prisma) entry
+      // then create a jwt with the user id
+      // then return the refreshToken to the user
       response.json({ accessToken });
     } catch (error) {
       next(error);
     }
   })
+  // TODO: a new endpoint called refresh
+  // it will take in a refreshToken
+  // verify the refreshToken
+  // if it is valid, create a new accessToken
+  // return the new accessToken
 
   .post('/signin', async (request, response, next) => {
     try {

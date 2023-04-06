@@ -90,3 +90,7 @@ export default router
       next();
     }
   });
+// TODO - Laura - add route to retrieve a user's favorited businesses
+// use the accessToken to determine which user it is (refer to user file)
+// read the user's favorites from db (prisma)
+// return those businesses information to the user

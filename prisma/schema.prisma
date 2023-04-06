@@ -72,3 +72,7 @@ model InvestorConnection {
 
   @@id([userId, businessId])
 }
+
+//TODO: Pablo - add RefreshToken model
+// include fields: id, userId, active (boolean), createdAt, User relationship
+// Prisma one to many relationship - https://www.prisma.io/docs/concepts/components/prisma-schema/relations/one-to-many-relations
