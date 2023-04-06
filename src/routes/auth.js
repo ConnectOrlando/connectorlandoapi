@@ -26,6 +26,7 @@ export default router
       const passwordHash = await bcrypt.hash(request.body.password, 10);
       const newUser = await Prisma.user.create({
         data: {
+          name: request.body.name,
           email: request.body.email.toLowerCase(),
           password: passwordHash,
         },

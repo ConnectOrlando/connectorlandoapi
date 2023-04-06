@@ -3,6 +3,7 @@ import { ArchivedError, RequestError } from '../constants/commonErrors.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
+import jwt from '../tools/jwt.js';
 
 const router = express.Router();
 
@@ -40,19 +41,25 @@ export default router
   // TODO:  laura - read by the token id
   .get('/', async (request, response, next) => {
     try {
-      // how to get the token request? -
-      //     request.header.authorization has your token
-      //       but it is structured like "Bearer YOUR_TOKEN"
-      //       so parse split the string by " " (space)
-      //       which results in ["Bearer", "YOUR_TOKEN"]
-      //       so your token is the 1st index
-      // const token = request.headers.authorization.split(' ')[1];
-      // verify the token (jwt.verify)
-      // const payload = await jwt.verify(myToken);
-      // payload.id = user's id
-      // retrieve the user with that id (PRISMA)
-      // return the user info
-      response.json({ message: 'changeMe' });
+      request.header.authorization;
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+      console.log(payload.id);
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: payload.id,
+        },
+      });
+      console.log(user); // TODO: finish writing what to return
+      const trimmedUser = _.pick(user, [
+        'id',
+        'name',
+        'email',
+        'isEmailVerified',
+        'bio',
+        'profileImage',
+      ]);
+      response.json({ user: trimmedUser });
     } catch (error) {
       next(error);
     }
@@ -72,7 +79,7 @@ export default router
         throw new ArchivedError('Account already deleted');
       }
 
-      _.pick(user, ['name', 'email', 'profile']); //etc
+      _.pick(user, ['name', 'email', 'profile']); //etc TODO: finish writing the return
       response.json(user);
     } catch (error) {
       next(error);
