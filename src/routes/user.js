@@ -38,16 +38,17 @@ export default router
       next(error);
     }
   })
-  // TODO:  laura - read by the token id
+  // DONE - READ BY USER ID
   .get('/', async (request, response, next) => {
     try {
       request.header.authorization;
       const accessToken = request.headers.authorization.split(' ')[1];
       const payload = await jwt.verify(accessToken);
       console.log(payload.id);
+      const userID = payload.id;
       const user = await Prisma.user.findUnique({
         where: {
-          id: payload.id,
+          id: userID,
         },
       });
       console.log(user); // TODO: finish writing what to return
@@ -91,8 +92,8 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
-      // TODO: Currently not picking request body
-      _.pick(request.body, [
+      // DONE - picking up request body
+      const dataToUpdate = _.pick(request.body, [
         'name',
         'profileImage',
         'title',
@@ -103,7 +104,7 @@ export default router
         where: {
           id: request.params.id,
         },
-        data: request.body,
+        data: dataToUpdate,
       });
       response.json({
         message: 'Succesfully updated user',
@@ -131,7 +132,7 @@ export default router
       response.json({
         message: 'Successfully archived user',
       });
-    } catch {
-      next();
+    } catch (error) {
+      next(error);
     }
   });
