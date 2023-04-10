@@ -8,6 +8,10 @@ export default (error, request, res, next) => {
     let { name, message, statusCode } = error;
     if (error.name === 'TokenExpiredError') {
       statusCode = 401;
+    } else if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+      name = 'PostBodyError';
+      statusCode = 400;
+      message = 'Post body must be valid JSON';
     } else if (ALLOWED_ERRORS.has(error.name)) {
       statusCode = 500;
     } else if (!checkIfCommonError(error)) {
