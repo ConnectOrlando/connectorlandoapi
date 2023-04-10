@@ -68,6 +68,9 @@ export default router
           id: request.params.id,
         },
       });
+      if (!user) {
+        throw new RequestError('User not found');
+      }
       if (user.isArchived) {
         throw new ArchivedError('Account already deleted');
       }
