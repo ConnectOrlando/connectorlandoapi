@@ -7,6 +7,7 @@ import routes from './routes.js';
 import morganMiddleware from './middleware/morgan.js';
 import errorHandler from './middleware/errorHandler.js';
 import { config } from 'dotenv';
+import tokenAuth from './middleware/tokenAuth.js';
 
 export default express()
   .use(cookieParser())
@@ -30,6 +31,7 @@ export default express()
         </div>
       `);
   })
+  .use(tokenAuth)
   .use('/', routes)
   .use(errorHandler)
   .use('*', (request, res) => {
