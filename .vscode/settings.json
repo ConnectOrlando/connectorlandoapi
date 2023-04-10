@@ -55,8 +55,23 @@
     "**/i18n": true,
     "**/config": true,
     "**/.gradle": true,
-    "**/.eyeglass_cache": true,
-    "storybook-static": true
+    "**/.eyeglass_cache": true
+  },
+  "search.exclude": {
+    "storybook-static": true,
+    "**/.factorypath": true,
+    "**/.vscode": true,
+    "**/.prettierrc": true,
+    "**/jsconfig.json": true,
+    "**/next.config.js": true,
+    "**/package.json": true,
+    "**/README.md": true,
+    "**/yarn.lock": true,
+    "**/.lintstagedrc.js": true,
+    "**/extensions.json": true,
+    "**/settings.json": true,
+    "**/.eslintrc.json": true,
+    "**/.gitignore": true
   },
   "files.exclude": {
     "**/.git": true,
@@ -73,8 +88,7 @@
     "**/_build": true,
     "**/.classpath": true,
     "**/.project": true,
-    "**/.settings": true,
-    "**/.factorypath": true
+    "**/.settings": true
   },
   "workbench.startupEditor": "none",
   "files.associations": {
@@ -95,5 +109,6 @@
   },
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
-  }
+  },
+  "explorer.compactFolders": false
 }
