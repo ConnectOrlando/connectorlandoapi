@@ -41,10 +41,11 @@ export default router
   // DONE - READ BY USER ID
   .get('/', async (request, response, next) => {
     try {
-      request.header.authorization;
+      if (!request.headers.authorization) {
+        throw new Error('Authorization header missing');
+      }
       const accessToken = request.headers.authorization.split(' ')[1];
       const payload = await jwt.verify(accessToken);
-      console.log(payload.id);
       const userID = payload.id;
       const user = await Prisma.user.findUnique({
         where: {
@@ -80,8 +81,8 @@ export default router
         throw new ArchivedError('Account already deleted');
       }
 
-      _.pick(user, ['name', 'email', 'profile']); //etc TODO: finish writing the return
-      response.json(user);
+      const trimmedUser = _.pick(user, ['name', 'email', 'profile']); // store the result of _.pick() in a variable
+      response.json(trimmedUser); // return trimmedUser instead of the original user object
     } catch (error) {
       next(error);
     }
