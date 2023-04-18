@@ -94,3 +94,62 @@ export default router
 // use the accessToken to determine which user it is (refer to user file)
 // read the user's favorites from db (prisma)
 // return those businesses information to the user
+// get favorite businesses for user
+router.get('/:userId/favorites', async (request, response, next) => {
+  try {
+    if (!request.params.userId) {
+      throw new RequestError('Must provide a valid userId');
+    }
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: request.params.userId,
+      },
+      include: {
+        favorites: {
+          include: {
+            business: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new RequestError(
+        `Could not find user with id ${request.params.userId}`
+      );
+    }
+    response.json(user.favorites.map(favorite => favorite.business));
+  } catch (error) {
+    next(error);
+  }
+});
+// retrieve user's connected businesses
+router.get('/connected/:userId', async (request, response, next) => {
+  try {
+    if (!request.params.userId) {
+      throw new RequestError('Must provide a valid user id');
+    }
+
+    // find user in database
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: request.params.userId,
+      },
+      include: {
+        connectedBusinesses: true,
+      },
+    });
+
+    if (!user) {
+      throw new RequestError(
+        `Could not find user with id ${request.params.userId}`
+      );
+    }
+
+    // return user's connected businesses
+    const businesses = user.connectedBusinesses;
+
+    response.json(businesses);
+  } catch (error) {
+    next(error);
+  }
+});
