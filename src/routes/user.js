@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
-
+import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
 export default router
@@ -38,11 +38,10 @@ export default router
       next(error);
     }
   })
-  // DONE - READ BY USER ID
   .get('/', async (request, response, next) => {
     try {
       if (!request.headers.authorization) {
-        throw new Error('Authorization header missing');
+        throw new AuthenticationError('Access token missing');
       }
       const accessToken = request.headers.authorization.split(' ')[1];
       const payload = await jwt.verify(accessToken);
@@ -52,7 +51,7 @@ export default router
           id: userID,
         },
       });
-      console.log(user); // TODO: finish writing what to return
+      // TODO: finish writing what to return
       const trimmedUser = _.pick(user, [
         'id',
         'name',
@@ -81,8 +80,8 @@ export default router
         throw new ArchivedError('Account already deleted');
       }
 
-      const trimmedUser = _.pick(user, ['name', 'email', 'profile']); // store the result of _.pick() in a variable
-      response.json(trimmedUser); // return trimmedUser instead of the original user object
+      const trimmedUser = _.pick(user, ['name', 'email', 'profile']);
+      response.json(trimmedUser);
     } catch (error) {
       next(error);
     }
@@ -93,7 +92,7 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
-      // DONE - picking up request body
+
       const dataToUpdate = _.pick(request.body, [
         'name',
         'profileImage',
@@ -137,3 +136,17 @@ export default router
       next(error);
     }
   });
+router.get('/user', async (request, response, next) => {
+  try {
+    const token = request.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, '1w');
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+    });
+    response.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
