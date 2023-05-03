@@ -25,10 +25,10 @@ function parseDotEnvironmentVariables() {
 }
 
 function processCorsWhitelist() {
-  if (CONFIG.CORS_WHITELIST.includes(',')) {
-    CONFIG.CORS_WHITELIST = CONFIG.CORS_WHITELIST.split(',').map(url =>
-      url.trim()
-    );
+  if (CONFIG.CORS_WHITELIST && CONFIG.CORS_WHITELIST.includes(',')) {
+    CONFIG.CORS_WHITELIST = CONFIG.CORS_WHITELIST.split(',').map(url => {
+      return url.trim();
+    });
   }
 }
 
