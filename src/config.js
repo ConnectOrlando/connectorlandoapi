@@ -11,6 +11,7 @@ async function initialize() {
     dotenv.config({ override: true });
     parseDotEnvironmentVariables();
     await readEnvironmentVariables();
+    processCorsWhitelist();
   }
   return ObjectUtil.finalize(CONFIG);
 }
@@ -20,6 +21,14 @@ function parseDotEnvironmentVariables() {
     CONFIG.PUBLIC_ROUTES = process.env.PUBLIC_ROUTES.split(',');
     delete process.env.PUBLIC_ROUTES;
     IGNORED_ENTRIES.push('PUBLIC_ROUTES');
+  }
+}
+
+function processCorsWhitelist() {
+  if (CONFIG.CORS_WHITELIST.includes(',')) {
+    CONFIG.CORS_WHITELIST = CONFIG.CORS_WHITELIST.split(',').map(url =>
+      url.trim()
+    );
   }
 }
 

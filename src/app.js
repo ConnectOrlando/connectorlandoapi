@@ -15,7 +15,7 @@ export default express()
   .use(morganMiddleware)
   .use(
     cors({
-      origin: config.BASE_URL,
+      origin: config.CORS_WHITELIST ?? config.BASE_URL,
       methods: 'GET,PUT,POST,DELETE',
       allowedHeaders: 'Content-Type, Authorization',
     })
