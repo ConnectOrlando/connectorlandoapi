@@ -90,11 +90,7 @@ export default router
       next();
     }
   });
-// TODO - Laura - add route to retrieve a user's favorited businesses
-// use the accessToken to determine which user it is (refer to user file)
-// read the user's favorites from db (prisma)
-// return those businesses information to the user
-// get favorite businesses for user
+
 router.get('/:userId/favorites', async (request, response, next) => {
   try {
     if (!request.params.userId) {
@@ -108,6 +104,11 @@ router.get('/:userId/favorites', async (request, response, next) => {
         favorites: {
           include: {
             business: true,
+          },
+          orderBy: {
+            business: {
+              name: 'asc',
+            },
           },
         },
       },
@@ -123,16 +124,14 @@ router.get('/:userId/favorites', async (request, response, next) => {
   }
 });
 // retrieve user's connected businesses
-router.get('/connected/:userId', async (request, response, next) => {
+router.get('/connected', async (request, response, next) => {
   try {
-    if (!request.params.userId) {
-      throw new RequestError('Must provide a valid user id');
-    }
+    const userId = request.user.id;
 
     // find user in database
     const user = await Prisma.user.findUnique({
       where: {
-        id: request.params.userId,
+        id: userId,
       },
       include: {
         connectedBusinesses: true,
@@ -140,9 +139,7 @@ router.get('/connected/:userId', async (request, response, next) => {
     });
 
     if (!user) {
-      throw new RequestError(
-        `Could not find user with id ${request.params.userId}`
-      );
+      throw new RequestError(`Could not find user with id ${userId}`);
     }
 
     // return user's connected businesses

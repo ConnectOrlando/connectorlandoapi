@@ -81,7 +81,9 @@ export default router
       }
 
       const trimmedUser = _.pick(user, ['name', 'email', 'profile']);
-      response.json(trimmedUser);
+      response.json({
+        user: trimmedUser,
+      });
     } catch (error) {
       next(error);
     }
@@ -139,7 +141,7 @@ export default router
 router.get('/user', async (request, response, next) => {
   try {
     const token = request.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, '1w');
+    const decodedToken = jwt.verify(token);
     const user = await Prisma.user.findUnique({
       where: {
         id: decodedToken.id,
