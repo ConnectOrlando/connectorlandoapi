@@ -8,6 +8,7 @@
     "ecmel.vscode-html-css",
     "esbenp.prettier-vscode",
     "Prisma.prisma",
+    "eamodio.gitlens",
     "Gruntfuggly.todo-tree"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
