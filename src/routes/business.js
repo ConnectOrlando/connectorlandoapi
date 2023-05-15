@@ -141,10 +141,7 @@ router.get('/connected', async (request, response, next) => {
       throw new RequestError(`Could not find user with id ${userId}`);
     }
 
-    // return user's connected businesses
-    const businesses = user.connectedBusinesses;
-
-    response.json(businesses);
+    response.json(user.connectedBusinesses);
   } catch (error) {
     next(error);
   }
