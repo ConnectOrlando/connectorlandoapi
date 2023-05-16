@@ -3,7 +3,8 @@ import { ArchivedError, RequestError } from '../constants/commonErrors.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
-
+import jwt from '../tools/jwt.js';
+import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
 export default router
@@ -37,22 +38,29 @@ export default router
       next(error);
     }
   })
-  // TODO:  laura - read by the token id
   .get('/', async (request, response, next) => {
     try {
-      // how to get the token request? -
-      //     request.header.authorization has your token
-      //       but it is structured like "Bearer YOUR_TOKEN"
-      //       so parse split the string by " " (space)
-      //       which results in ["Bearer", "YOUR_TOKEN"]
-      //       so your token is the 1st index
-      // const token = request.headers.authorization.split(' ')[1];
-      // verify the token (jwt.verify)
-      // const payload = await jwt.verify(myToken);
-      // payload.id = user's id
-      // retrieve the user with that id (PRISMA)
-      // return the user info
-      response.json({ message: 'changeMe' });
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+      const userID = payload.id;
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: userID,
+        },
+      });
+
+      const trimmedUser = _.pick(user, [
+        'id',
+        'name',
+        'email',
+        'isEmailVerified',
+        'bio',
+        'profileImage',
+      ]);
+      response.json({ user: trimmedUser });
     } catch (error) {
       next(error);
     }
@@ -75,8 +83,10 @@ export default router
         throw new ArchivedError('Account already deleted');
       }
 
-      _.pick(user, ['name', 'email', 'profile']); //etc
-      response.json(user);
+      const trimmedUser = _.pick(user, ['name', 'email', 'profile']);
+      response.json({
+        user: trimmedUser,
+      });
     } catch (error) {
       next(error);
     }
@@ -87,8 +97,8 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
-      // TODO: Currently not picking request body
-      _.pick(request.body, [
+
+      const dataToUpdate = _.pick(request.body, [
         'name',
         'profileImage',
         'title',
@@ -99,7 +109,7 @@ export default router
         where: {
           id: request.params.id,
         },
-        data: request.body,
+        data: dataToUpdate,
       });
       response.json({
         message: 'Succesfully updated user',
@@ -127,7 +137,21 @@ export default router
       response.json({
         message: 'Successfully archived user',
       });
-    } catch {
-      next();
+    } catch (error) {
+      next(error);
+    }
+  })
+  .get('/user', async (request, response, next) => {
+    try {
+      const token = request.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token);
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: decodedToken.id,
+        },
+      });
+      response.json(user);
+    } catch (error) {
+      next(error);
     }
   });

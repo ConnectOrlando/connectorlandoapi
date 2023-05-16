@@ -2,6 +2,8 @@ import express from 'express';
 import { ArchivedError, RequestError } from '../constants/commonErrors.js';
 import Prisma from '../tools/prisma.js';
 import _ from 'lodash-es';
+import jwt from '../tools/jwt.js';
+import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
 export default router
@@ -73,7 +75,6 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
-      // non blocking - send notes about async/await
       await Prisma.business.update({
         where: {
           id: request.params.id,
@@ -90,7 +91,60 @@ export default router
       next();
     }
   });
-// TODO - Laura - add route to retrieve a user's favorited businesses
-// use the accessToken to determine which user it is (refer to user file)
-// read the user's favorites from db (prisma)
-// return those businesses information to the user
+
+router.get('/favorites', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+    const userID = payload.id;
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: userID,
+      },
+      include: {
+        favorites: {
+          include: {
+            business: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new RequestError(`Could not find user with id ${userID}`);
+    }
+    response.json(user.favorites.map(favorite => favorite.business));
+  } catch (error) {
+    next(error);
+  }
+});
+
+// retrieve user's connected businesses
+router.get('/connected', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+    const userID = payload.id;
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: userID,
+      },
+      include: {
+        connectedBusinesses: true,
+      },
+    });
+
+    if (!user) {
+      throw new RequestError(`Could not find user with id ${userID}`);
+    }
+
+    response.json(user.connectedBusinesses);
+  } catch (error) {
+    next(error);
+  }
+});
