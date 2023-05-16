@@ -137,8 +137,7 @@ export default router
     } catch (error) {
       next(error);
     }
-  });
-router.get('/user', async (request, response, next) => {
+  }).get('/user', async (request, response, next) => {
   try {
     const token = request.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token);
