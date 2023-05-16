@@ -51,7 +51,7 @@ export default router
           id: userID,
         },
       });
-      // TODO: finish writing what to return
+
       const trimmedUser = _.pick(user, [
         'id',
         'name',
@@ -137,17 +137,18 @@ export default router
     } catch (error) {
       next(error);
     }
-  }).get('/user', async (request, response, next) => {
-  try {
-    const token = request.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token);
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: decodedToken.id,
-      },
-    });
-    response.json(user);
-  } catch (error) {
-    next(error);
-  }
-});
+  })
+  .get('/user', async (request, response, next) => {
+    try {
+      const token = request.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token);
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: decodedToken.id,
+        },
+      });
+      response.json(user);
+    } catch (error) {
+      next(error);
+    }
+  });

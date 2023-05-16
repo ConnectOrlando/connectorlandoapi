@@ -75,7 +75,6 @@ export default router
       if (!request.params.id) {
         throw new RequestError('Must provide a valid id');
       }
-      // non blocking - send notes about async/await
       await Prisma.business.update({
         where: {
           id: request.params.id,
@@ -125,12 +124,15 @@ router.get('/favorites', async (request, response, next) => {
 // retrieve user's connected businesses
 router.get('/connected', async (request, response, next) => {
   try {
-    const userId = request.user.id;
-
-    // find user in database
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+    const userID = payload.id;
     const user = await Prisma.user.findUnique({
       where: {
-        id: userId,
+        id: userID,
       },
       include: {
         connectedBusinesses: true,
@@ -138,7 +140,7 @@ router.get('/connected', async (request, response, next) => {
     });
 
     if (!user) {
-      throw new RequestError(`Could not find user with id ${userId}`);
+      throw new RequestError(`Could not find user with id ${userID}`);
     }
 
     response.json(user.connectedBusinesses);
