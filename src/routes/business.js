@@ -90,6 +90,67 @@ export default router
     } catch {
       next();
     }
+  })
+
+  // Add a business as a user's connection
+  .post('/connect/:id', async (request, response, next) => {
+    try {
+      if (!request.params.id) {
+        throw new RequestError('Must provide a valid id');
+      }
+
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+      const userID = payload.id;
+
+      // Check if the user exists
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: userID,
+        },
+      });
+
+      if (!user) {
+        throw new RequestError(`Could not find user with id ${userID}`);
+      }
+
+      // Check if the business exists
+      const business = await Prisma.business.findUnique({
+        where: {
+          id: request.params.id,
+        },
+      });
+
+      if (!business) {
+        throw new RequestError(
+          `Could not find business with id ${request.params.id}`
+        );
+      }
+
+      // Add the business as a connection for the user
+      await Prisma.user.update({
+        where: {
+          id: userID,
+        },
+        data: {
+          connectedBusinesses: {
+            connect: {
+              id: business.id,
+            },
+          },
+        },
+      });
+
+      response.json({
+        message: 'Successfully added business as a connection',
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
 router.get('/favorites', async (request, response, next) => {
