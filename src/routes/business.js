@@ -107,17 +107,6 @@ export default router
       const payload = await jwt.verify(accessToken);
       const userID = payload.id;
 
-      // Check if the user exists
-      const user = await Prisma.user.findUnique({
-        where: {
-          id: userID,
-        },
-      });
-
-      if (!user) {
-        throw new RequestError(`Could not find user with id ${userID}`);
-      }
-
       // Check if the business exists
       const business = await Prisma.business.findUnique({
         where: {
@@ -130,8 +119,6 @@ export default router
           `Could not find business with id ${request.params.id}`
         );
       }
-
-      // Add the business as a connection for the user
       await Prisma.user.update({
         where: {
           id: userID,
