@@ -92,7 +92,6 @@ export default router
     }
   })
 
-  // Add a business as a user's connection
   .post('/connect/:id', async (request, response, next) => {
     try {
       if (!request.params.id) {
@@ -107,18 +106,6 @@ export default router
       const payload = await jwt.verify(accessToken);
       const userID = payload.id;
 
-      // Check if the user exists
-      const user = await Prisma.user.findUnique({
-        where: {
-          id: userID,
-        },
-      });
-
-      if (!user) {
-        throw new RequestError(`Could not find user with id ${userID}`);
-      }
-
-      // Check if the business exists
       const business = await Prisma.business.findUnique({
         where: {
           id: request.params.id,
@@ -130,8 +117,6 @@ export default router
           `Could not find business with id ${request.params.id}`
         );
       }
-
-      // Add the business as a connection for the user
       await Prisma.user.update({
         where: {
           id: userID,
@@ -151,62 +136,8 @@ export default router
     } catch (error) {
       next(error);
     }
-  })
-
-  // Add a business as a user's favorite
-  .post('/favorite/:id', async (request, response, next) => {
-    try {
-      if (!request.params.id) {
-        throw new RequestError('Must provide a valid id');
-      }
-
-      if (!request.headers.authorization) {
-        throw new AuthenticationError('Access token missing');
-      }
-
-      const accessToken = request.headers.authorization.split(' ')[1];
-      const payload = await jwt.verify(accessToken);
-      const userID = payload.id;
-
-      // Check if the user exists
-      const user = await Prisma.user.findUnique({
-        where: {
-          id: userID,
-        },
-      });
-
-      if (!user) {
-        throw new RequestError(`Could not find user with id ${userID}`);
-      }
-
-      // Check if the business exists
-      const business = await Prisma.business.findUnique({
-        where: {
-          id: request.params.id,
-        },
-      });
-
-      if (!business) {
-        throw new RequestError(
-          `Could not find business with id ${request.params.id}`
-        );
-      }
-
-      // Add the business as a favorite for the user
-      await Prisma.favorite.create({
-        data: {
-          userId: user.id,
-          businessId: business.id,
-        },
-      });
-
-      response.json({
-        message: 'Successfully added business as a favorite',
-      });
-    } catch (error) {
-      next(error);
-    }
   });
+
 router.get('/favorites', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -215,28 +146,12 @@ router.get('/favorites', async (request, response, next) => {
     const accessToken = request.headers.authorization.split(' ')[1];
     const payload = await jwt.verify(accessToken);
     const userID = payload.id;
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        favorites: {
-          include: {
-            business: true,
-          },
-        },
-      },
-    });
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
-    response.json(user.favorites.map(favorite => favorite.business));
+    response.json(userID.favorites.map(favorite => favorite.business));
   } catch (error) {
     next(error);
   }
 });
 
-// retrieve user's connected businesses
 router.get('/connected', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -245,20 +160,8 @@ router.get('/connected', async (request, response, next) => {
     const accessToken = request.headers.authorization.split(' ')[1];
     const payload = await jwt.verify(accessToken);
     const userID = payload.id;
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        connectedBusinesses: true,
-      },
-    });
 
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
-
-    response.json(user.connectedBusinesses);
+    response.json(userID.connectedBusinesses);
   } catch (error) {
     next(error);
   }
