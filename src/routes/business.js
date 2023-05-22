@@ -32,20 +32,15 @@ export default router
       next(error);
     }
   })
-
-  // create
   .post('/', async (request, response, next) => {
     try {
       if (!request.body.name || !request.body.type || !request.body.mission) {
         throw new RequestError('Must provide a valid name, type, and mission');
-        // To create business in database
       }
     } catch (error) {
       next(error);
     }
   })
-
-  //update
   .patch('/:id', async (request, response, next) => {
     try {
       if (!request.params.id) {
@@ -68,7 +63,6 @@ export default router
       next(error);
     }
   })
-  //delete
   .delete('/:id', async (request, response, next) => {
     console.log('Here');
     try {
@@ -91,7 +85,6 @@ export default router
       next();
     }
   })
-
   .post('/connect/:id', async (request, response, next) => {
     try {
       if (!request.params.id) {
