@@ -36,10 +36,21 @@ export default router
   // create
   .post('/', async (request, response, next) => {
     try {
-      if (!request.body.name || !request.body.type || !request.body.mission) {
+      const { name, type, mission } = request.body;
+
+      if (!name || !type || !mission) {
         throw new RequestError('Must provide a valid name, type, and mission');
-        // To create business in database
       }
+
+      const newBusiness = await Prisma.business.create({
+        data: {
+          name,
+          type,
+          mission,
+        },
+      });
+
+      response.json(newBusiness);
     } catch (error) {
       next(error);
     }
