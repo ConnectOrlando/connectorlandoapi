@@ -90,61 +90,48 @@ export default router
     } catch {
       next();
     }
-  });
+  })
 
-router.get('/favorites', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-    const userID = payload.id;
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        favorites: {
-          include: {
-            business: true,
-          },
+  .post('/:id/save', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+      const userID = payload.id;
+
+      const businessID = request.params.id;
+
+      if (!businessID) {
+        throw new RequestError('Must provide a valid business ID');
+      }
+
+      // Check if the business is already saved by the user
+      const existingSaved = await Prisma.favorite.findFirst({
+        where: {
+          userID,
+          businessID,
         },
-      },
-    });
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
-    response.json(user.favorites.map(favorite => favorite.business));
-  } catch (error) {
-    next(error);
-  }
-});
+      });
 
-// retrieve user's connected businesses
-router.get('/connected', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-    const userID = payload.id;
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        connectedBusinesses: true,
-      },
-    });
+      if (existingSaved) {
+        throw new RequestError('Business is already saved by the user');
+      }
 
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
+      // Create the favorite connection
+      await Prisma.Saved.create({
+        data: {
+          userID,
+          businessID,
+        },
+      });
 
-    response.json(user.connectedBusinesses);
-  } catch (error) {
-    next(error);
-  }
-});
+      response.json({
+        message: 'Successfully saved business',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
