@@ -55,6 +55,42 @@ export default router
       next(error);
     }
   })
+  // Add a business as user's connection
+  .post('/connected', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+      const userID = payload.id;
+
+      // Check if the user is already connected to the business
+      const existingConnection = await Prisma.userBusinessConnection.findFirst({
+        where: {
+          userID,
+        },
+      });
+
+      if (existingConnection) {
+        throw new RequestError('User is already connected to this business');
+      }
+
+      // Create the user-business connection
+      await Prisma.userBusinessConnection.create({
+        data: {
+          userID,
+        },
+      });
+
+      response.json({
+        message: 'Successfully added business as user connection',
+      });
+    } catch (error) {
+      next(error);
+    }
+  })
 
   //update
   .patch('/:id', async (request, response, next) => {
