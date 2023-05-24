@@ -148,3 +148,97 @@ router.get('/connected', async (request, response, next) => {
     next(error);
   }
 });
+// Add a business to user's favorites
+router.post('/favorites/:id', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+
+    if (!request.params.id) {
+      throw new RequestError('Must provide a valid business id');
+    }
+
+    const business = await Prisma.business.findUnique({
+      where: {
+        id: request.params.id,
+      },
+    });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
+    await Prisma.favorite.create({
+      data: {
+        user: {
+          connect: {
+            id: payload.id,
+          },
+        },
+        business: {
+          connect: {
+            id: business.id,
+          },
+        },
+      },
+    });
+
+    response.json({
+      message: 'Business successfully added to favorites',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Add a business as user's connection
+router.post('/connected/:id', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+
+    if (!request.params.id) {
+      throw new RequestError('Must provide a valid business id');
+    }
+
+    const business = await Prisma.business.findUnique({
+      where: {
+        id: request.params.id,
+      },
+    });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
+
+    await Prisma.connectedBusiness.create({
+      data: {
+        user: {
+          connect: {
+            id: payload.id,
+          },
+        },
+        business: {
+          connect: {
+            id: business.id,
+          },
+        },
+      },
+    });
+
+    response.json({
+      message: 'Business successfully added as connection',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
