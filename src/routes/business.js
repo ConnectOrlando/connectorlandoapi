@@ -48,6 +48,11 @@ export default router
           type,
           mission,
         },
+        select: {
+          name: true,
+          type: true,
+          mission: true,
+        },
       });
 
       response.json(newBusiness);
