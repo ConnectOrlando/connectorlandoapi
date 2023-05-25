@@ -9,51 +9,102 @@ import Prisma from '../tools/prisma.js';
 
 const router = express.Router();
 
-export default router
-  .post('/signup', async (request, response, next) => {
+export default router.post('/signup', async (request, response, next) => {
+  try {
+    if (!request.body.name || !request.body.email || !request.body.password) {
+      throw new RequestError('Must provide a valid name, email, and password');
+    }
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: request.body.email,
+      },
+    });
+    if (user) {
+      throw new RequestError('An account with that email already exists');
+    }
+    const passwordHash = await bcrypt.hash(request.body.password, 10);
+    const newUser = await Prisma.user.create({
+      data: {
+        name: request.body.name,
+        email: request.body.email.toLowerCase(),
+        password: passwordHash,
+      },
+      // TODO: ACTIVITY TOKEN
+    });
+    const accessToken = jwt.sign(
+      {
+        id: newUser.id,
+      },
+      '1w'
+    );
+
+    response.json({ accessToken });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/refresh', async (request, response, next) => {
+  try {
+    const { refreshToken } = request.body;
+    if (!refreshToken) {
+      throw new RequestError('Refresh token is required');
+    }
+
+    // Verify and decode the refresh token
+    const decodedToken = jwt.verify(refreshToken, 'refreshTokenSecret');
+
+    // Retrieve the user from the decoded token
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+    });
+
+    if (!user) {
+      throw new AuthenticationError('User not found');
+    }
+
+    // Generate a new access token
+    const accessToken = jwt.sign({ id: user.id }, 'accessTokenSecret', {
+      expiresIn: '15m',
+    });
+
+    response.json({ accessToken });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router
+  .post('/refresh', async (request, response, next) => {
     try {
-      if (!request.body.name || !request.body.email || !request.body.password) {
-        throw new RequestError(
-          'Must provide a valid name, email, and password'
-        );
+      const { refreshToken } = request.body;
+      if (!refreshToken) {
+        throw new RequestError('Refresh token is required');
       }
+
+      const decodedToken = jwt.verify(refreshToken, 'refreshTokenSecret');
+
       const user = await Prisma.user.findUnique({
         where: {
-          email: request.body.email,
+          id: decodedToken.id,
         },
       });
-      if (user) {
-        throw new RequestError('An account with that email already exists');
+
+      if (!user) {
+        throw new AuthenticationError('User not found');
       }
-      const passwordHash = await bcrypt.hash(request.body.password, 10);
-      const newUser = await Prisma.user.create({
-        data: {
-          name: request.body.name,
-          email: request.body.email.toLowerCase(),
-          password: passwordHash,
-        },
-        // TODO: ACTIVITY TOKEN
+
+      const accessToken = jwt.sign({ id: user.id }, 'accessTokenSecret', {
+        expiresIn: '15m',
       });
-      const accessToken = jwt.sign(
-        {
-          id: newUser.id,
-        },
-        '1w'
-      );
-      // TODO: also, create a refreshToken and return to user
-      // first - create new database (prisma) entry
-      // then create a jwt with the user id
-      // then return the refreshToken to the user
+
       response.json({ accessToken });
     } catch (error) {
       next(error);
     }
   })
-  // TODO: a new endpoint called refresh
-  // it will take in a refreshToken
-  // verify the refreshToken
-  // if it is valid, create a new accessToken
-  // return the new accessToken
 
   .post('/signin', async (request, response, next) => {
     try {
