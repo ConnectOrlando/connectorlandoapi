@@ -172,14 +172,12 @@ router.post('/favorites/:id', async (request, response, next) => {
         `Could not find business with id ${request.params.id}`
       );
     }
-    await Prisma.favorite.create({
+    await Prisma.user.update({
+      where: {
+        id: payload.id,
+      },
       data: {
-        user: {
-          connect: {
-            id: payload.id,
-          },
-        },
-        business: {
+        favorites: {
           connect: {
             id: business.id,
           },
