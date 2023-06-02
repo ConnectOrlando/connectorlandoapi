@@ -12,7 +12,8 @@
     "lint": "eslint --ext=.js --ignore-path=.gitignore src",
     "lint:fix": "yarn run lint --fix",
     "format": "prettier --write --ignore-path=.gitignore \"src/**/*.{js,jsx}\"",
-    "prisma": "npx prisma db push && npx prisma db seed && npx prisma studio"
+    "prisma": "npx prisma db push && npx prisma studio",
+    "prisma:reset": "npx prisma db push && npx prisma db seed && npx prisma studio"
   },
   "author": "Laura Boettcher, Pablo Najera",
   "license": "ISC",
