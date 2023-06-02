@@ -218,18 +218,10 @@ router.post('/connected/:id', async (request, response, next) => {
       );
     }
 
-    await Prisma.connectedBusiness.create({
+    await Prisma.investorConnection.create({
       data: {
-        user: {
-          connect: {
-            id: payload.id,
-          },
-        },
-        business: {
-          connect: {
-            id: business.id,
-          },
-        },
+        userId: payload.id,
+        businessId: business.id,
       },
     });
 
