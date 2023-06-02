@@ -184,6 +184,18 @@ router.post('/favorites/:id', async (request, response, next) => {
         },
       },
     });
+    await Prisma.user.update({
+      where: {
+        id: payload.id,
+      },
+      data: {
+        favorites: {
+          connect: {
+            id: business.id,
+          },
+        },
+      },
+    });
 
     response.json({
       message: 'Business successfully added to favorites',
