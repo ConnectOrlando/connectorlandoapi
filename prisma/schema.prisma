@@ -36,6 +36,7 @@ model User {
   updatedAt              DateTime             @default(now()) @updatedAt
   isArchived             Boolean              @default(false)
   archivedAt             DateTime?
+  RefreshTokens          RefreshTokens[]
 }
 
 //Business
@@ -73,6 +74,11 @@ model InvestorConnection {
   @@id([userId, businessId])
 }
 
-//TODO: Pablo - add RefreshToken model
-// include fields: id, userId, active (boolean), createdAt, User relationship
-// Prisma one to many relationship - https://www.prisma.io/docs/concepts/components/prisma-schema/relations/one-to-many-relations
+model RefreshTokens {
+  id              String   @id @default(uuid()) @db.Uuid
+  date            DateTime @default(now())
+  ipAddress       String
+  userAgent       String?
+  userId          String?  @db.Uuid
+  User           User?     @relation(fields: [userId], references: [id])
+}
