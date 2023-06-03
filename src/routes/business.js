@@ -206,7 +206,7 @@ router.post('/favorites/:id', async (request, response, next) => {
 });
 
 // Add a business as user's connection
-router.post('/connected/:id', async (request, response, next) => {
+router.post('/connections/:id', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
       throw new AuthenticationError('Access token missing');
