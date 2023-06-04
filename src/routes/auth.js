@@ -84,7 +84,6 @@ export default router
         userId: user.id,
       });
 
-      // TODO: activity token
       response.json({ accessToken, refreshToken });
     } catch (error) {
       next(error);
