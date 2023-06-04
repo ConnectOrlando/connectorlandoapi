@@ -82,7 +82,6 @@ export default router
         '1w'
       );
 
-      // TODO: activity token
       response.json({ accessToken });
     } catch (error) {
       next(error);
