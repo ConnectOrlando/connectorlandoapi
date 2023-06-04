@@ -36,10 +36,26 @@ export default router
   // create
   .post('/', async (request, response, next) => {
     try {
-      if (!request.body.name || !request.body.type || !request.body.mission) {
+      const { name, type, mission } = request.body;
+
+      if (!name || !type || !mission) {
         throw new RequestError('Must provide a valid name, type, and mission');
-        // To create business in database
       }
+
+      const newBusiness = await Prisma.business.create({
+        data: {
+          name,
+          type,
+          mission,
+        },
+        select: {
+          name: true,
+          type: true,
+          mission: true,
+        },
+      });
+
+      response.json(newBusiness);
     } catch (error) {
       next(error);
     }
@@ -144,6 +160,90 @@ router.get('/connected', async (request, response, next) => {
     }
 
     response.json(user.connectedBusinesses);
+  } catch (error) {
+    next(error);
+  }
+});
+// Add a business to user's favorites
+router.post('/favorites/:id', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+
+    if (!request.params.id) {
+      throw new RequestError('Must provide a valid business id');
+    }
+
+    const business = await Prisma.business.findUnique({
+      where: {
+        id: request.params.id,
+      },
+    });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
+    await Prisma.user.update({
+      where: {
+        id: payload.id,
+      },
+      data: {
+        favorites: {
+          connect: {
+            id: business.id,
+          },
+        },
+      },
+    });
+
+    response.json({
+      message: 'Business successfully added to favorites',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Add a business as user's connection
+router.post('/connections/:id', async (request, response, next) => {
+  try {
+    if (!request.headers.authorization) {
+      throw new AuthenticationError('Access token missing');
+    }
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+
+    if (!request.params.id) {
+      throw new RequestError('Must provide a valid business id');
+    }
+
+    const business = await Prisma.business.findUnique({
+      where: {
+        id: request.params.id,
+      },
+    });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
+
+    await Prisma.investorConnection.create({
+      data: {
+        userId: payload.id,
+        businessId: business.id,
+      },
+    });
+
+    response.json({
+      message: 'Business successfully added as connection',
+    });
   } catch (error) {
     next(error);
   }
