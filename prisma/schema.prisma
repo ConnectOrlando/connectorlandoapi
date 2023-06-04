@@ -80,5 +80,5 @@ model RefreshTokens {
   ipAddress       String
   userAgent       String?
   userId          String?  @db.Uuid
-  User           User?     @relation(fields: [userId], references: [id])
+  User            User?    @relation(fields: [userId], references: [id])
 }
