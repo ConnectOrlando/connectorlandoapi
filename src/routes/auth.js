@@ -6,8 +6,13 @@ import bcrypt from 'bcrypt';
 import express from 'express';
 import jwt from '../tools/jwt.js';
 import Prisma from '../tools/prisma.js';
+import mailgun from 'mailgun-js';
 
 const router = express.Router();
+const mg = mailgun({
+  apiKey: 'key-be435e340c2674abc7d433862acbe740',
+  domain: 'api.connectorlando.tech',
+});
 
 export default router
   .post('/signup', async (request, response, next) => {
@@ -87,3 +92,56 @@ export default router
       next(error);
     }
   });
+
+router.post('/forgotPassword', async (request, response, next) => {
+  try {
+    if (!request.body.email) {
+      throw new RequestError('Must provide a valid email');
+    }
+
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: request.body.email,
+      },
+    });
+
+    if (!user) {
+      throw new RequestError('Account does not exist');
+    }
+
+    const resetToken = generateResetToken();
+
+    await Prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        resetToken,
+      },
+    });
+
+    sendResetPasswordEmail(user.email, resetToken);
+
+    response.json({
+      message: 'Password reset link has been sent to your email',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+function generateResetToken() {
+  const resetToken = 'abcd1234';
+  return resetToken;
+}
+
+async function sendResetPasswordEmail(email, resetToken) {
+  const data = {
+    from: 'Your Name <your-email@example.com>',
+    to: email,
+    subject: 'Password Reset',
+    text: `Click on the following link to reset your password: https://example.com/resetPassword?token=${resetToken}`,
+  };
+
+  await mg.messages().send(data);
+}
