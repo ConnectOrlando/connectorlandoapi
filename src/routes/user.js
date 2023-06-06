@@ -41,9 +41,7 @@ router.get('/', async (request, response, next) => {
     if (!request.headers.authorization) {
       throw new AuthenticationError('Access token missing');
     }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-    const userID = payload.id;
+    const userID = request.authorizedUser.id;
     const user = await Prisma.user.findUnique({
       where: {
         id: userID,
