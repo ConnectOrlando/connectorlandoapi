@@ -35,6 +35,7 @@ router.post('/', async (request, response, next) => {
     next(error);
   }
 });
+
 router.get('/', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -62,6 +63,7 @@ router.get('/', async (request, response, next) => {
     next(error);
   }
 });
+
 // read
 router.get('/:id', async (request, response, next) => {
   try {
@@ -88,6 +90,7 @@ router.get('/:id', async (request, response, next) => {
     next(error);
   }
 });
+
 //update
 router.patch('/:id', async (request, response, next) => {
   try {
@@ -115,6 +118,7 @@ router.patch('/:id', async (request, response, next) => {
     next(error);
   }
 });
+
 //delete
 router.delete('/:id', async (request, response, next) => {
   try {
@@ -138,6 +142,7 @@ router.delete('/:id', async (request, response, next) => {
     next(error);
   }
 });
+
 router.get('/user', async (request, response, next) => {
   try {
     const token = request.headers.authorization.split(' ')[1];
@@ -152,4 +157,5 @@ router.get('/user', async (request, response, next) => {
     next(error);
   }
 });
+
 export default router;
