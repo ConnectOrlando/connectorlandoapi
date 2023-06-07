@@ -106,142 +106,142 @@ export default router
     } catch {
       next();
     }
+  })
+
+  .get('/favorites', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+      const userID = request.authorizedUser.id;
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: userID,
+        },
+        include: {
+          favorites: {
+            include: {
+              business: true,
+            },
+          },
+        },
+      });
+      if (!user) {
+        throw new RequestError(`Could not find user with id ${userID}`);
+      }
+      response.json(user.favorites.map(favorite => favorite.business));
+    } catch (error) {
+      next(error);
+    }
+  })
+
+  // retrieve user's connected businesses
+  .get('/connected', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+      const userID = request.authorizedUser.id;
+
+      const user = await Prisma.user.findUnique({
+        where: {
+          id: userID,
+        },
+        include: {
+          connectedBusinesses: true,
+        },
+      });
+
+      if (!user) {
+        throw new RequestError(`Could not find user with id ${userID}`);
+      }
+
+      response.json(user.connectedBusinesses);
+    } catch (error) {
+      next(error);
+    }
+  })
+  // Add a business to user's favorites
+  .post('/favorites/:id', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+
+      if (!request.params.id) {
+        throw new RequestError('Must provide a valid business id');
+      }
+
+      const business = await Prisma.business.findUnique({
+        where: {
+          id: request.params.id,
+        },
+      });
+
+      if (!business) {
+        throw new RequestError(
+          `Could not find business with id ${request.params.id}`
+        );
+      }
+      await Prisma.user.update({
+        where: {
+          id: payload.id,
+        },
+        data: {
+          favorites: {
+            connect: {
+              id: business.id,
+            },
+          },
+        },
+      });
+
+      response.json({
+        message: 'Business successfully added to favorites',
+      });
+    } catch (error) {
+      next(error);
+    }
+  })
+
+  // Add a business as user's connection
+  .post('/connections/:id', async (request, response, next) => {
+    try {
+      if (!request.headers.authorization) {
+        throw new AuthenticationError('Access token missing');
+      }
+      const accessToken = request.headers.authorization.split(' ')[1];
+      const payload = await jwt.verify(accessToken);
+
+      if (!request.params.id) {
+        throw new RequestError('Must provide a valid business id');
+      }
+
+      const business = await Prisma.business.findUnique({
+        where: {
+          id: request.params.id,
+        },
+      });
+
+      if (!business) {
+        throw new RequestError(
+          `Could not find business with id ${request.params.id}`
+        );
+      }
+
+      await Prisma.investorConnection.create({
+        data: {
+          userId: payload.id,
+          businessId: business.id,
+        },
+      });
+
+      response.json({
+        message: 'Business successfully added as connection',
+      });
+    } catch (error) {
+      next(error);
+    }
   });
-
-router.get('/favorites', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const userID = request.authorizedUser.id;
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        favorites: {
-          include: {
-            business: true,
-          },
-        },
-      },
-    });
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
-    response.json(user.favorites.map(favorite => favorite.business));
-  } catch (error) {
-    next(error);
-  }
-});
-
-// retrieve user's connected businesses
-router.get('/connected', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const userID = request.authorizedUser.id;
-
-    const user = await Prisma.user.findUnique({
-      where: {
-        id: userID,
-      },
-      include: {
-        connectedBusinesses: true,
-      },
-    });
-
-    if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
-    }
-
-    response.json(user.connectedBusinesses);
-  } catch (error) {
-    next(error);
-  }
-});
-// Add a business to user's favorites
-router.post('/favorites/:id', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-
-    if (!request.params.id) {
-      throw new RequestError('Must provide a valid business id');
-    }
-
-    const business = await Prisma.business.findUnique({
-      where: {
-        id: request.params.id,
-      },
-    });
-
-    if (!business) {
-      throw new RequestError(
-        `Could not find business with id ${request.params.id}`
-      );
-    }
-    await Prisma.user.update({
-      where: {
-        id: payload.id,
-      },
-      data: {
-        favorites: {
-          connect: {
-            id: business.id,
-          },
-        },
-      },
-    });
-
-    response.json({
-      message: 'Business successfully added to favorites',
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Add a business as user's connection
-router.post('/connections/:id', async (request, response, next) => {
-  try {
-    if (!request.headers.authorization) {
-      throw new AuthenticationError('Access token missing');
-    }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-
-    if (!request.params.id) {
-      throw new RequestError('Must provide a valid business id');
-    }
-
-    const business = await Prisma.business.findUnique({
-      where: {
-        id: request.params.id,
-      },
-    });
-
-    if (!business) {
-      throw new RequestError(
-        `Could not find business with id ${request.params.id}`
-      );
-    }
-
-    await Prisma.investorConnection.create({
-      data: {
-        userId: payload.id,
-        businessId: business.id,
-      },
-    });
-
-    response.json({
-      message: 'Business successfully added as connection',
-    });
-  } catch (error) {
-    next(error);
-  }
-});
