@@ -16,39 +16,22 @@ async function sendTextEmail({
   subject,
   text,
 }) {
-  if (
-    validator.isEmail(from) &&
-    to &&
-    validator.isEmail(to) &&
-    subject &&
-    text
-  ) {
-    try {
-      await client.messages.create(DOMAIN, {
-        from,
-        to,
-        subject,
-        text,
-      });
-    } catch (error) {
-      throw new Error(error);
-    }
-  } else {
-    var errorString = 'emailService requires a valid: \n';
-    if (!from || !validator.isEmail(from)) {
-      errorString += '- from\n';
-    }
-    if (!to || !validator.isEmail(to)) {
-      errorString += '- to\n';
-    }
-    if (!subject) {
-      errorString += '- subject\n';
-    }
-    if (!text) {
-      errorString += '- text\n';
-    }
-    throw new Error(errorString);
+  if (!validator.isEmail(to)) {
+    throw new Error('emailService requires a valid to');
+  } else if (!validator.isEmail(from)) {
+    throw new Error('emailService requires a valid from');
+  } else if (!subject) {
+    throw new Error('emailService requires a valid subject');
+  } else if (!text) {
+    throw new Error('emailService requires a valid text');
   }
+
+  await client.messages.create(DOMAIN, {
+    from,
+    to,
+    subject,
+    text,
+  });
 }
 
 async function sendHtmlEmail({
@@ -57,39 +40,22 @@ async function sendHtmlEmail({
   subject,
   html,
 }) {
-  if (
-    validator.isEmail(from) &&
-    to &&
-    validator.isEmail(to) &&
-    subject &&
-    html
-  ) {
-    try {
-      await client.messages.create(DOMAIN, {
-        from,
-        to,
-        subject,
-        html,
-      });
-    } catch (error) {
-      throw new Error(error);
-    }
-  } else {
-    var errorString = 'emailService requires a valid: \n';
-    if (!from || !validator.isEmail(from)) {
-      errorString += '- from\n';
-    }
-    if (!to || !validator.isEmail(to)) {
-      errorString += '- to\n';
-    }
-    if (!subject) {
-      errorString += '- subject\n';
-    }
-    if (!html) {
-      errorString += '- html\n';
-    }
-    throw new Error(errorString);
+  if (!validator.isEmail(to)) {
+    throw new Error('emailService requires a valid to');
+  } else if (!validator.isEmail(from)) {
+    throw new Error('emailService requires a valid from');
+  } else if (!subject) {
+    throw new Error('emailService requires a valid subject');
+  } else if (!html) {
+    throw new Error('emailService requires a valid html');
   }
+
+  await client.messages.create(DOMAIN, {
+    from,
+    to,
+    subject,
+    html,
+  });
 }
 
 export default {
