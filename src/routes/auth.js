@@ -11,7 +11,6 @@ import Logger from '../tools/logger.js';
 
 const router = express.Router();
 
-export default router;
 router.post('/signup', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -50,6 +49,7 @@ router.post('/signup', async (request, response, next) => {
     next(error);
   }
 });
+
 router.post('/signin', async (request, response, next) => {
   try {
     if (!request.body.email || !request.body.password) {
@@ -87,6 +87,7 @@ router.post('/signin', async (request, response, next) => {
     next(error);
   }
 });
+
 router.post('/signout', async (request, response) => {
   try {
     if (request.body.refreshToken) {
@@ -105,6 +106,7 @@ router.post('/signout', async (request, response) => {
     response.json({ message: 'Successfully logged out' });
   }
 });
+
 router.post('/refresh', async (request, res, next) => {
   try {
     const refreshToken = await TokenService.extractRefreshToken(
@@ -133,3 +135,5 @@ router.post('/refresh', async (request, res, next) => {
     next(error);
   }
 });
+
+export default router;

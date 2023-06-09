@@ -6,8 +6,6 @@ import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
-
-export default router;
 // create
 router.post('/', async (request, response, next) => {
   try {
@@ -36,6 +34,7 @@ router.post('/', async (request, response, next) => {
     next(error);
   }
 });
+
 router.get('/', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -102,7 +101,7 @@ router.patch('/:id', async (request, response, next) => {
       'title',
       'isInvestor',
       'linkedin',
-    ]); //etc, nothing compromising!
+    ]);
     await Prisma.user.update({
       where: {
         id: request.params.id,
@@ -122,7 +121,6 @@ router.delete('/:id', async (request, response, next) => {
     if (!request.params.id) {
       throw new RequestError('Must provide a valid id');
     }
-    // non blocking - send notes about async/await
     await Prisma.user.update({
       where: {
         id: request.params.id,
@@ -139,6 +137,7 @@ router.delete('/:id', async (request, response, next) => {
     next(error);
   }
 });
+
 router.get('/user', async (request, response, next) => {
   try {
     const token = request.headers.authorization.split(' ')[1];
@@ -153,3 +152,4 @@ router.get('/user', async (request, response, next) => {
     next(error);
   }
 });
+export default router;
