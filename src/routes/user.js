@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
-import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
 export default router
@@ -38,32 +37,25 @@ export default router
       next(error);
     }
   })
-  .get('/', async (request, response, next) => {
-    try {
-      if (!request.headers.authorization) {
-        throw new AuthenticationError('Access token missing');
-      }
-      const accessToken = request.headers.authorization.split(' ')[1];
-      const payload = await jwt.verify(accessToken);
-      const userID = payload.id;
-      const user = await Prisma.user.findUnique({
-        where: {
-          id: userID,
-        },
-      });
+  .get('/', async (request, response) => {
+    const accessToken = request.headers.authorization.split(' ')[1];
+    const payload = await jwt.verify(accessToken);
+    const userID = payload.id;
+    const user = await Prisma.user.findUnique({
+      where: {
+        id: userID,
+      },
+    });
 
-      const trimmedUser = _.pick(user, [
-        'id',
-        'name',
-        'email',
-        'isEmailVerified',
-        'bio',
-        'profileImage',
-      ]);
-      response.json({ user: trimmedUser });
-    } catch (error) {
-      next(error);
-    }
+    const trimmedUser = _.pick(user, [
+      'id',
+      'name',
+      'email',
+      'isEmailVerified',
+      'bio',
+      'profileImage',
+    ]);
+    response.json({ user: trimmedUser });
   })
   // read
   .get('/:id', async (request, response, next) => {
@@ -119,27 +111,20 @@ export default router
     }
   })
   //delete
-  .delete('/:id', async (request, response, next) => {
-    try {
-      if (!request.params.id) {
-        throw new RequestError('Must provide a valid id');
-      }
-      // non blocking - send notes about async/await
-      await Prisma.user.update({
-        where: {
-          id: request.params.id,
-        },
-        data: {
-          isArchived: true,
-          archivedAt: new Date(),
-        },
-      });
-      response.json({
-        message: 'Successfully archived user',
-      });
-    } catch (error) {
-      next(error);
-    }
+  .delete('/:id', async (request, response) => {
+    // non blocking - send notes about async/await
+    await Prisma.user.update({
+      where: {
+        id: request.params.id,
+      },
+      data: {
+        isArchived: true,
+        archivedAt: new Date(),
+      },
+    });
+    response.json({
+      message: 'Successfully archived user',
+    });
   })
   .get('/user', async (request, response, next) => {
     try {
