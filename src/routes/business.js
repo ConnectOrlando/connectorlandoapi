@@ -2,7 +2,6 @@ import express from 'express';
 import { ArchivedError, RequestError } from '../constants/commonErrors.js';
 import Prisma from '../tools/prisma.js';
 import _ from 'lodash-es';
-import jwt from '../tools/jwt.js';
 const router = express.Router();
 
 export default router
@@ -107,9 +106,6 @@ export default router
   });
 
 router.get('/favorites', async (request, response) => {
-  const accessToken = request.headers.authorization.split(' ')[1];
-  const payload = await jwt.verify(accessToken);
-  const userID = payload.id;
   const user = await Prisma.user.findUnique({
     where: {
       id: request.authorizedUser.id,
@@ -123,16 +119,15 @@ router.get('/favorites', async (request, response) => {
     },
   });
   if (!user) {
-    throw new RequestError(`Could not find user with id ${userID}`);
+    throw new RequestError(
+      `Could not find user with id ${request.authorizedUser.id}`
+    );
   }
   response.json(user.favorites.map(favorite => favorite.business));
 });
 
 // retrieve user's connected businesses
 router.get('/connected', async (request, response) => {
-  const accessToken = request.headers.authorization.split(' ')[1];
-  const payload = await jwt.verify(accessToken);
-  const userID = payload.id;
   const user = await Prisma.user.findUnique({
     where: {
       id: request.authorizedUser.id,
@@ -143,20 +138,18 @@ router.get('/connected', async (request, response) => {
   });
 
   if (!user) {
-    throw new RequestError(`Could not find user with id ${userID}`);
+    throw new RequestError(
+      `Could not find user with id ${request.authorizedUser.id}`
+    );
   }
 
   response.json(user.connectedBusinesses);
 });
 // Add a business to user's favorites
 router.post('/favorites/:id', async (request, response) => {
-  const accessToken = request.headers.authorization.split(' ')[1];
-  const payload = await jwt.verify(accessToken);
-
   if (!request.params.id) {
     throw new RequestError('Must provide a valid business id');
   }
-
   const business = await Prisma.business.findUnique({
     where: {
       id: request.params.id,
@@ -170,7 +163,7 @@ router.post('/favorites/:id', async (request, response) => {
   }
   await Prisma.user.update({
     where: {
-      id: payload.id,
+      id: request.authenticatedUser.id,
     },
     data: {
       favorites: {
@@ -188,9 +181,6 @@ router.post('/favorites/:id', async (request, response) => {
 
 // Add a business as user's connection
 router.post('/connections/:id', async (request, response) => {
-  const accessToken = request.headers.authorization.split(' ')[1];
-  const payload = await jwt.verify(accessToken);
-
   if (!request.params.id) {
     throw new RequestError('Must provide a valid business id');
   }
@@ -209,7 +199,7 @@ router.post('/connections/:id', async (request, response) => {
 
   await Prisma.investorConnection.create({
     data: {
-      userId: payload.id,
+      userId: request.authenticatedUser.id,
       businessId: business.id,
     },
   });
