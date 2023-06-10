@@ -5,6 +5,7 @@ import express from 'express';
 import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
+import emailService from '../services/emailService.js';
 const router = express.Router();
 
 export default router
@@ -21,9 +22,24 @@ export default router
           email: request.body.email,
         },
       });
+
       if (user) {
         throw new RequestError('Email already exists');
       }
+
+      const payload = {
+        name: request.body.name,
+        email: request.body.email,
+      };
+      const expiration = '3m';
+      const newToken = jwt.sign(payload, expiration);
+      const confirmEmailUrl = `https://connectorlando.tech/confirmEmail/${newToken}`;
+
+      emailService.sendTextEmail({
+        subject: 'ConnectOrlando Confirmation Email',
+        to: request.body.email,
+        text: `Please click the following link to confirm email: ${confirmEmailUrl}`,
+      });
 
       const passwordHash = await bcrypt.hash(request.body.password, 10);
       const newUser = await Prisma.user.create({
