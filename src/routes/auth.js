@@ -136,36 +136,31 @@ router.post('/refresh', async (request, res, next) => {
   }
 });
 
-// router.post('/forgotPassword', async (req, res) => {
-//   try {
-//     const { email } = req.body;
+router.post('/forgotPassword', async (req, res) => {
+  try {
+    const { email } = req.body;
 
-//     /
-//     const resetToken = generateResetToken();
+    const resetToken = generateResetToken();
 
-//     const resetLink = `https://example.com/reset-password?token=${resetToken}`;
-//     await emailService.sendTextEmail({
-//       to: email,
-//       subject: 'Password Reset',
-//       html: `Click <a href="${resetLink}">here</a> to reset your password.`,
-//     });
+    const resetLink = `https://example.com/reset-password?token=${resetToken}`;
+    // eslint-disable-next-line no-undef
+    await emailService.sendTextEmail({
+      to: email,
+      subject: 'Password Reset',
+      html: `Click <a href="${resetLink}">here</a> to reset your password.`,
+    });
 
-//     res.status(200).json({ message: 'Password reset link sent successfully' });
-//   } catch (error) {
-//     console.error('Error sending forgot password email:', error);
-//     res.status(500).json({
-//       error: 'An error occurred while sending the forgot password email',
-//     });
-//   }
-// });
+    res.status(200).json({ message: 'Password reset link sent successfully' });
+  } catch (error) {
+    console.error('Error sending forgot password email:', error);
+    res.status(500).json({
+      error: 'An error occurred while sending the forgot password email',
+    });
+  }
+});
 
-// app.listen(3001, () => {
-//   console.log('Server is running on port 3001');
-// });
+function generateResetToken() {
+  const token = Math.random().toString(36).slice(2, 12);
 
-// function generateResetToken() {
-
-//   const token = Math.random().toString(36).substr(2, 10);
-
-//   return token;
-// }
+  return token;
+}
