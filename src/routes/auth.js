@@ -10,6 +10,7 @@ import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
 
 const router = express.Router();
+export default router;
 
 router.post('/signup', async (request, response, next) => {
   try {
@@ -31,7 +32,6 @@ router.post('/signup', async (request, response, next) => {
         email: request.body.email.toLowerCase(),
         password: passwordHash,
       },
-      // TODO: ACTIVITY TOKEN
     });
     const accessToken = jwt.sign(
       {
@@ -136,4 +136,36 @@ router.post('/refresh', async (request, res, next) => {
   }
 });
 
-export default router;
+// router.post('/forgotPassword', async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     /
+//     const resetToken = generateResetToken();
+
+//     const resetLink = `https://example.com/reset-password?token=${resetToken}`;
+//     await emailService.sendTextEmail({
+//       to: email,
+//       subject: 'Password Reset',
+//       html: `Click <a href="${resetLink}">here</a> to reset your password.`,
+//     });
+
+//     res.status(200).json({ message: 'Password reset link sent successfully' });
+//   } catch (error) {
+//     console.error('Error sending forgot password email:', error);
+//     res.status(500).json({
+//       error: 'An error occurred while sending the forgot password email',
+//     });
+//   }
+// });
+
+// app.listen(3001, () => {
+//   console.log('Server is running on port 3001');
+// });
+
+// function generateResetToken() {
+
+//   const token = Math.random().toString(36).substr(2, 10);
+
+//   return token;
+// }
