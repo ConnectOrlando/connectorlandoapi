@@ -6,7 +6,7 @@ import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
-// create
+
 router.post('/', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -62,7 +62,7 @@ router.get('/', async (request, response, next) => {
     next(error);
   }
 });
-// read
+
 router.get('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -88,7 +88,7 @@ router.get('/:id', async (request, response, next) => {
     next(error);
   }
 });
-//update
+
 router.patch('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -115,7 +115,7 @@ router.patch('/:id', async (request, response, next) => {
     next(error);
   }
 });
-//delete
+
 router.delete('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
