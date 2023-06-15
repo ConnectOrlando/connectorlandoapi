@@ -32,7 +32,6 @@ router.get('/:id', async (request, response, next) => {
   }
 });
 
-// create
 router.post('/', async (request, response, next) => {
   try {
     const { name, type, mission } = request.body;
@@ -60,7 +59,6 @@ router.post('/', async (request, response, next) => {
   }
 });
 
-//update
 router.patch('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -83,7 +81,7 @@ router.patch('/:id', async (request, response, next) => {
     next(error);
   }
 });
-//delete
+
 router.delete('/:id', async (request, response, next) => {
   console.log('Here');
   try {
@@ -136,7 +134,6 @@ router.get('/favorites', async (request, response, next) => {
   }
 });
 
-// retrieve user's connected businesses
 router.get('/connected', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -164,7 +161,6 @@ router.get('/connected', async (request, response, next) => {
   }
 });
 
-// Add a business to user's favorites
 router.post('/favorites/:id', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -209,7 +205,6 @@ router.post('/favorites/:id', async (request, response, next) => {
   }
 });
 
-// Add a business as user's connection
 router.post('/connections/:id', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {

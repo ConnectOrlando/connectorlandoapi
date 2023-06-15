@@ -31,7 +31,6 @@ router.post('/signup', async (request, response, next) => {
         email: request.body.email.toLowerCase(),
         password: passwordHash,
       },
-      // TODO: ACTIVITY TOKEN
     });
     const accessToken = jwt.sign(
       {
