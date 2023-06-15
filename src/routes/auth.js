@@ -74,7 +74,7 @@ router.post('/signin', async (request, response, next) => {
       {
         id: user.id,
       },
-      '1w'
+      '15min'
     );
 
     const refreshToken = await TokenService.getSignedRefreshToken({
