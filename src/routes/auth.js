@@ -8,6 +8,7 @@ import jwt from '../tools/jwt.js';
 import Prisma from '../tools/prisma.js';
 import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
+import emailService from '../services/emailService.js';
 
 const router = express.Router();
 export default router;
@@ -143,16 +144,15 @@ router.post('/forgotPassword', async (req, res) => {
     const resetToken = generateResetToken();
 
     const resetLink = `https://example.com/reset-password?token=${resetToken}`;
-    // eslint-disable-next-line no-undef
-    await emailService.sendTextEmail({
+
+    await emailService.sendHtmlEmail({
       to: email,
       subject: 'Password Reset',
       html: `Click <a href="${resetLink}">here</a> to reset your password.`,
     });
 
     res.status(200).json({ message: 'Password reset link sent successfully' });
-  } catch (error) {
-    console.error('Error sending forgot password email:', error);
+  } catch {
     res.status(500).json({
       error: 'An error occurred while sending the forgot password email',
     });
