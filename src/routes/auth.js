@@ -136,31 +136,41 @@ router.post('/refresh', async (request, res, next) => {
     next(error);
   }
 });
-
-router.post('/forgotPassword', async (req, res) => {
+router.post('/forgotpassword', async (request, response, next) => {
   try {
-    const { email } = req.body;
+    if (!request.body.email) {
+      throw new RequestError('Must provide a valid email');
+    }
 
-    const resetToken = generateResetToken();
-
-    const resetLink = `https://example.com/reset-password?token=${resetToken}`;
-
-    await emailService.sendHtmlEmail({
-      to: email,
-      subject: 'Password Reset',
-      html: `Click <a href="${resetLink}">here</a> to reset your password.`,
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: request.body.email,
+      },
     });
 
-    res.status(200).json({ message: 'Password reset link sent successfully' });
-  } catch {
-    res.status(500).json({
-      error: 'An error occurred while sending the forgot password email',
+    if (!user) {
+      throw new RequestError('Account does not exist');
+    }
+
+    const resetToken = jwt.sign(
+      {
+        id: user.id,
+      },
+      '15min'
+    );
+
+    const resetLink = `http://your-website.com/resetpassword?token=${resetToken}`;
+    const emailSubject = 'Password Reset Request';
+    const emailText = `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Connectorlando Team`;
+
+    await emailService.sendTextEmail({
+      to: user.email,
+      subject: emailSubject,
+      text: emailText,
     });
+
+    response.json({ message: 'Password reset link sent to your email' });
+  } catch (error) {
+    next(error);
   }
 });
-
-function generateResetToken() {
-  const token = Math.random().toString(36).slice(2, 12);
-
-  return token;
-}
