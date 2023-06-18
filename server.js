@@ -2,10 +2,12 @@ import app from './src/app.js';
 import Logger from './src/tools/logger.js';
 import config from './src/config.js';
 
-app.listen(config.PORT || 3001, () => {
+const port = config.PORT || 3001;
+
+app.listen(port, () => {
   Logger.info(
     `ConnectOrlandoAPI listening at ${
-      config.BASE_URL || 'http://localhost:3001'
+      config.BASE_URL || `http://localhost:${port}`
     }`
   );
 });
