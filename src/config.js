@@ -25,7 +25,9 @@ function parseDotEnvironmentVariables() {
     }
     // BASE_URL is used by the server to determine the URL to use for the API
     // When running locally, it should not be read from the .env file
-    delete process.env.BASE_URL;
+    if (process.env.BASE_URL?.includes('localhost')) {
+      delete process.env.BASE_URL;
+    }
   }
 }
 
