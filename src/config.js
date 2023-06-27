@@ -17,10 +17,17 @@ async function initialize() {
 }
 
 function parseDotEnvironmentVariables() {
-  if (process.env && process.env.PUBLIC_ROUTES) {
-    CONFIG.PUBLIC_ROUTES = process.env.PUBLIC_ROUTES.split(',');
-    delete process.env.PUBLIC_ROUTES;
-    IGNORED_ENTRIES.push('PUBLIC_ROUTES');
+  if (process.env) {
+    if (process.env.PUBLIC_ROUTES) {
+      CONFIG.PUBLIC_ROUTES = process.env.PUBLIC_ROUTES.split(',');
+      delete process.env.PUBLIC_ROUTES;
+      IGNORED_ENTRIES.push('PUBLIC_ROUTES');
+    }
+    // BASE_URL is used by the server to determine the URL to use for the API
+    // When running locally, it should not be read from the .env file
+    if (process.env.BASE_URL?.includes('localhost')) {
+      delete process.env.BASE_URL;
+    }
   }
 }
 
