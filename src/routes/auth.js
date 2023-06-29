@@ -11,8 +11,6 @@ import Logger from '../tools/logger.js';
 import emailService from '../services/emailService.js';
 
 const router = express.Router();
-export default router;
-
 router.post('/signup', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -159,7 +157,7 @@ router.post('/forgotpassword', async (request, response, next) => {
       '15min'
     );
 
-    const resetLink = `http://your-website.com/resetpassword?token=${resetToken}`;
+    const resetLink = `http://connectorlando.tech/resetpassword?token=${resetToken}`;
     const emailSubject = 'Password Reset Request';
     const emailText = `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Connectorlando Team`;
 
@@ -174,3 +172,4 @@ router.post('/forgotpassword', async (request, response, next) => {
     next(error);
   }
 });
+export default router;
