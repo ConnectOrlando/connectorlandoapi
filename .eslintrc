@@ -42,5 +42,15 @@
     "prefer-const": "error",
     "require-atomic-updates": "error",
     "no-return-await": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["tests/**"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"],
+      "rules": {
+        "jest/no-identical-title": "error"
+      }
+    }
+  ]
 }

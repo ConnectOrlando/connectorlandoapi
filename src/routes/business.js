@@ -26,7 +26,7 @@ router.get('/:id', async (request, response, next) => {
     }
 
     _.pick(business, ['name', 'email', 'profile']); //etc
-    response.json(business);
+    response.json({ business });
   } catch (error) {
     next(error);
   }
@@ -46,14 +46,9 @@ router.post('/', async (request, response, next) => {
         type,
         mission,
       },
-      select: {
-        name: true,
-        type: true,
-        mission: true,
-      },
     });
 
-    response.json(newBusiness);
+    response.json({ business: newBusiness });
   } catch (error) {
     next(error);
   }
