@@ -165,7 +165,7 @@ router.post('/forgotpassword', async (request, response, next) => {
 
     await emailService.sendTextEmail({
       to: user.email,
-      subject: emailSubject,
+      subject: 'Password Reset Request',
       text: emailText,
     });
 
