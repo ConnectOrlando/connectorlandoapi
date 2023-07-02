@@ -9,6 +9,8 @@ import Prisma from '../tools/prisma.js';
 import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
 import emailService from '../services/emailService.js';
+import config from '../config.js';
+import { text } from 'body-parser';
 
 const router = express.Router();
 router.post('/signup', async (request, response, next) => {
@@ -146,28 +148,17 @@ router.post('/forgotpassword', async (request, response, next) => {
       },
     });
 
-    if (!user) {
-      throw new RequestError('Account does not exist');
-    }
+    const resetToken = jwt.sign({}, '1w');
 
-    const resetToken = jwt.sign(
-      {
-        id: user.id,
-      },
-      '15min'
-    );
-
-    const resetLink = `http://connectorlando.tech/resetpassword?token=${resetToken}`;
-    const emailSubject = 'Password Reset Request';
-    const emailText = `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Connectorlando Team`;
+    const resetLink = `${config.CLIENT_URL}/resetpassword?token=${resetToken}`;
 
     await emailService.sendTextEmail({
       to: user.email,
       subject: 'Password Reset Request',
-      text: emailText,
+      text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Connectorlando Team`,
     });
 
-    response.json({ message: 'Password reset link sent to your email' });
+    response.json({ message: text });
   } catch (error) {
     next(error);
   }
