@@ -75,7 +75,7 @@ router.post('/signin', async (request, response, next) => {
       {
         id: user.id,
       },
-      '15min'
+      '1w'
     );
 
     const refreshToken = await TokenService.getSignedRefreshToken({
@@ -155,7 +155,7 @@ router.post('/forgotpassword', async (request, response, next) => {
     await emailService.sendTextEmail({
       to: user.email,
       subject: 'Password Reset Request',
-      text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Connectorlando Team`,
+      text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n,\nThe Connectorlando Team`,
     });
 
     response.json({ message: text });
