@@ -73,7 +73,7 @@ router.post('/signin', async (request, response, next) => {
       {
         id: user.id,
       },
-      '15min'
+      '1w'
     );
 
     const refreshToken = await TokenService.getSignedRefreshToken({
@@ -123,12 +123,7 @@ router.post('/refresh', async (request, res, next) => {
       throw new AuthenticationError('Invalid refresh token');
     }
 
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-      },
-      '15min'
-    );
+    const accessToken = jwt.sign({}, '1w');
     res.json({ accessToken });
   } catch (error) {
     next(error);
