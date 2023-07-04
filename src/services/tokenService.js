@@ -34,7 +34,8 @@ export async function getSignedRefreshToken({ request, userId }) {
  * @param {JsonWebToken} signedRefreshToken
  * @returns {RefreshToken} RefreshToken database object
  */
-export async function extractRefreshToken(signedRefreshToken) {
+
+export async function extractRefreshToken(signedRefreshToken, request) {
   const refreshTokenInfo = await jwt.verify(signedRefreshToken);
   const refreshToken = await Prisma.refreshTokens.findUnique({
     where: { id: refreshTokenInfo?.refreshTokenId },
@@ -42,10 +43,20 @@ export async function extractRefreshToken(signedRefreshToken) {
   if (!refreshToken) {
     throw new AuthenticationError('Refresh token not found');
   }
+  /**
+   * I was trying to compare the user information from the request with the refresh token's info, I am not sure if this is the correct way to do it.
+   */
+  const ipAddress =
+    request.headers['x-forwarded-for'] || request.socket.remoteAddress;
+  const userAgent = request.headers['user-agent'];
+  if (
+    refreshToken.ipAddress !== ipAddress ||
+    refreshToken.userAgent !== userAgent
+  ) {
+    throw new AuthenticationError(
+      'User information does not match the refresh token'
+    );
+  }
+
   return refreshToken;
 }
-
-export default {
-  getSignedRefreshToken,
-  extractRefreshToken,
-};
