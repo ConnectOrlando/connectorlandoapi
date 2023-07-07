@@ -47,9 +47,7 @@ export async function extractRefreshToken(signedRefreshToken, request) {
   if (!refreshToken) {
     throw new AuthenticationError('Refresh token not found');
   }
-  /**
-   * I was trying to compare the user information from the request with the refresh token's info, I am not sure if this is the correct way to do it.
-   */
+
   const ipAddress =
     request.headers['x-forwarded-for'] || request.socket.remoteAddress;
   const userAgent = request.headers['user-agent'];
