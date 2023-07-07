@@ -10,7 +10,6 @@ import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
 import emailService from '../services/emailService.js';
 import config from '../config.js';
-import { text } from 'body-parser';
 
 const router = express.Router();
 router.post('/signup', async (request, response, next) => {
@@ -136,7 +135,8 @@ router.post('/refresh', async (request, res, next) => {
     next(error);
   }
 });
-router.post('/forgotpassword', async (request, response, next) => {
+router.post('/forgot-password', async (request, response) => {
+  let userExists = false;
   try {
     if (!request.body.email) {
       throw new RequestError('Must provide a valid email');
@@ -148,19 +148,35 @@ router.post('/forgotpassword', async (request, response, next) => {
       },
     });
 
-    const resetToken = jwt.sign({}, '1w');
+    if (user) {
+      userExists = true;
 
-    const resetLink = `${config.CLIENT_URL}/resetpassword?token=${resetToken}`;
+      const resetToken = jwt.sign({ email: user.email }, '1w');
 
-    await emailService.sendTextEmail({
-      to: user.email,
-      subject: 'Password Reset Request',
-      text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n,\nThe Connectorlando Team`,
-    });
+      const resetLink = `${config.CLIENT_URL}/reset-password?-token=${resetToken}`;
 
-    response.json({ message: text });
+      await emailService.sendTextEmail({
+        to: user.email,
+        subject: 'Password Reset Request',
+        text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n,\n ConnectOrlando`,
+      });
+    }
   } catch (error) {
-    next(error);
+    console.error(error);
+
+    response
+      .status(200)
+      .json({ message: 'Password reset request has been processed.' });
+    return;
+  } finally {
+    if (!userExists) {
+      response
+        .status(200)
+        .json({ message: 'Password reset request has been processed.' });
+    }
   }
+  response
+    .status(200)
+    .json({ message: 'Password reset request has been processed.' });
 });
 export default router;
