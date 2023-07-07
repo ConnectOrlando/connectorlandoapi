@@ -11,6 +11,10 @@ import { AuthenticationError } from '../constants/commonErrors.js';
  * @param {String} Info.userId - User's id
  * @return {JsonWebToken} Signed refresh token
  */
+export default {
+  getSignedRefreshToken,
+  extractRefreshToken,
+};
 export async function getSignedRefreshToken({ request, userId }) {
   const refreshToken = await Prisma.refreshTokens.create({
     data: {
