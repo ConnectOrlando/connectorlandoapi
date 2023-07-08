@@ -56,7 +56,7 @@ export async function extractRefreshToken(signedRefreshToken, request) {
     refreshToken.userAgent !== userAgent
   ) {
     throw new AuthenticationError(
-      'User information does not match the refresh token'
+      'Security issue found with refresh token. Please sign in again to get a new refresh token.'
     );
   }
 
