@@ -144,7 +144,7 @@ router.post('/forgot-password', async (request, response) => {
 
     const user = await Prisma.user.findUnique({
       where: {
-        email: request.body.email,
+        email: request.body.email.toLowerCase(),
       },
     });
 
@@ -163,20 +163,10 @@ router.post('/forgot-password', async (request, response) => {
     }
   } catch (error) {
     console.error(error);
-
-    response
-      .status(200)
-      .json({ message: 'Password reset request has been processed.' });
-    return;
   } finally {
     if (!userExists) {
-      response
-        .status(200)
-        .json({ message: 'Password reset request has been processed.' });
+      response.json({ message: 'Password reset request has been processed.' });
     }
   }
-  response
-    .status(200)
-    .json({ message: 'Password reset request has been processed.' });
 });
 export default router;
