@@ -11,7 +11,7 @@
 - [ ] New feature
 - [ ] Infrastructure
 
-# How Has This Been Tested?
+### How Has This Been Tested?
 
 <!-- Please describe the tests that you ran to verify your changes. For example:
  - Ran locally
@@ -20,12 +20,12 @@
  -->
  -
 
- # New Environment Variables (if any)
+ ### New Environment Variables (if any)
 
 <!-- Please include a list of any new environment variables introduced -->
 -
 
-# Checklist:
+### Checklist:
 
 - [ ] I have performed a self-review of my own code
 - [ ] I have written/modified relevant tests
