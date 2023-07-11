@@ -3,7 +3,7 @@ import { ArchivedError, RequestError } from '../constants/commonErrors.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
-import jwt from '../tools/jwt.js';
+
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
@@ -137,11 +137,9 @@ router.delete('/:id', async (request, response, next) => {
 
 router.get('/user', async (request, response, next) => {
   try {
-    const token = request.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token);
     const user = await Prisma.user.findUnique({
       where: {
-        id: decodedToken.id,
+        id: request.authorizedUser.id,
       },
     });
     response.json(user);
