@@ -6,7 +6,7 @@ import Prisma from '../tools/prisma.js';
 import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
-
+// creating new user data in database
 router.post('/', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -34,7 +34,7 @@ router.post('/', async (request, response, next) => {
     next(error);
   }
 });
-
+//get logged in user information
 router.get('/', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -62,7 +62,7 @@ router.get('/', async (request, response, next) => {
     next(error);
   }
 });
-
+// search for user by id
 router.get('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -88,7 +88,7 @@ router.get('/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// used to update user info
 router.patch('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -115,7 +115,7 @@ router.patch('/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// delete/archive account
 router.delete('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -137,7 +137,7 @@ router.delete('/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// why does this route exist when we have the '/' route already doing the same thing? can we delete this
 router.get('/user', async (request, response, next) => {
   try {
     const token = request.headers.authorization.split(' ')[1];

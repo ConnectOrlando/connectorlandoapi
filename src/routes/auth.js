@@ -10,7 +10,7 @@ import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
 
 const router = express.Router();
-
+// signing up for an account
 router.post('/signup', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -48,7 +48,7 @@ router.post('/signup', async (request, response, next) => {
     next(error);
   }
 });
-
+// sign in to account
 router.post('/signin', async (request, response, next) => {
   try {
     if (!request.body.email || !request.body.password) {
@@ -86,7 +86,7 @@ router.post('/signin', async (request, response, next) => {
     next(error);
   }
 });
-
+//signout
 router.post('/signout', async (request, response) => {
   try {
     if (request.body.refreshToken) {

@@ -5,7 +5,7 @@ import _ from 'lodash-es';
 import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
-
+//get business info by id
 router.get('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -31,7 +31,7 @@ router.get('/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// Creating a new business account
 router.post('/', async (request, response, next) => {
   try {
     const { name, type, mission } = request.body;
@@ -53,7 +53,7 @@ router.post('/', async (request, response, next) => {
     next(error);
   }
 });
-
+// update business info
 router.patch('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -76,7 +76,7 @@ router.patch('/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// archiving business account
 router.delete('/:id', async (request, response, next) => {
   console.log('Here');
   try {
@@ -99,7 +99,7 @@ router.delete('/:id', async (request, response, next) => {
     next();
   }
 });
-
+//find user's favorite businesses. this isn't working for me, i got a prisma error
 router.get('/favorites', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -128,7 +128,7 @@ router.get('/favorites', async (request, response, next) => {
     next(error);
   }
 });
-
+// get the user's connected businesses. this one isn't working for me either, same prisma error
 router.get('/connected', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -155,7 +155,7 @@ router.get('/connected', async (request, response, next) => {
     next(error);
   }
 });
-
+// add new favorite businesses
 router.post('/favorites/:id', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
@@ -199,7 +199,7 @@ router.post('/favorites/:id', async (request, response, next) => {
     next(error);
   }
 });
-
+// connect with new businesses
 router.post('/connections/:id', async (request, response, next) => {
   try {
     if (!request.headers.authorization) {
