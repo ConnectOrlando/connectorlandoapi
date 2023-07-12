@@ -125,21 +125,13 @@ router.post('/refresh', async (request, res, next) => {
     if (!user) {
       throw new AuthenticationError('Invalid refresh token');
     }
+    const accessToken = jwt.sign(
+      {
+        id: user.id,
+      },
+      '15min'
+    );
 
-    const ipAddress =
-      request.headers['x-forwarded-for'] || request.socket.remoteAddress;
-    const userAgent = request.headers['user-agent'];
-
-    if (
-      refreshToken.ipAddress !== ipAddress ||
-      refreshToken.userAgent !== userAgent
-    ) {
-      throw new AuthenticationError(
-        'Security issue found with refresh token. Please sign in again to get a new refresh token.'
-      );
-    }
-
-    const accessToken = jwt.sign({ email: user.email }, '1w');
     res.json({ accessToken });
   } catch (error) {
     next(error);
