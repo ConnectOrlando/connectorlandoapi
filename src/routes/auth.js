@@ -109,7 +109,8 @@ router.post('/signout', async (request, response) => {
 router.post('/refresh', async (request, res, next) => {
   try {
     const refreshToken = await TokenService.extractRefreshToken(
-      request.body.refreshToken
+      request.body.refreshToken,
+      request
     );
     const user = await Prisma.user.findUnique({
       where: { id: refreshToken.userId },
