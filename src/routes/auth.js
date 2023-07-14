@@ -137,7 +137,6 @@ router.post('/refresh', async (request, res, next) => {
   }
 });
 router.post('/forgot-password', async (request, response) => {
-  let userExists = false;
   try {
     if (!request.body.email) {
       throw new RequestError('Must provide a valid email');
@@ -150,8 +149,6 @@ router.post('/forgot-password', async (request, response) => {
     });
 
     if (user) {
-      userExists = true;
-
       const resetToken = jwt.sign({ email: user.email }, '1w');
 
       const resetLink = `${config.CLIENT_URL}/reset-password?-token=${resetToken}`;
@@ -165,9 +162,7 @@ router.post('/forgot-password', async (request, response) => {
   } catch (error) {
     console.error(error);
   } finally {
-    if (!userExists) {
-      response.json({ message: 'Password reset request has been processed.' });
-    }
+    response.json({ message: 'Password reset request has been processed.' });
   }
 });
 export default router;
