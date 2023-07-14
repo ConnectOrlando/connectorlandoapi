@@ -118,8 +118,6 @@ router.post('/refresh', async (request, res, next) => {
         id: true,
         email: true,
         name: true,
-        ipAddress: true,
-        userAgent: true,
       },
     });
     if (!user) {
