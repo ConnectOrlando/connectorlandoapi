@@ -6,6 +6,12 @@ import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
+console.log(_.isString('hello'));
+console.log(_.isString('') && !_.isEmpty(''));
+console.log(_.isString('          ') && _.isEmpty('          '));
+console.log(_.isString('          t'));
+console.log(_.isString('          t           '));
+
 router.get('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
