@@ -23,13 +23,15 @@ router.get('/:id', async (request, response, next) => {
       },
     });
     if (!business) {
-      throw new RequestError(`Could not find that business`);
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
     }
     if (business.isArchived) {
       throw new ArchivedError('Business account already deleted');
     }
 
-    _.pick(business, ['name', 'email', 'profile']); //etc
+    _.pick(business, ['name', 'email']); //etc
     response.json({ business });
   } catch (error) {
     next(error);
