@@ -17,6 +17,12 @@
   "plugins": ["unicorn", "import", "prettier", "node"],
   "settings": {},
   "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     // Mainly to make sure that the imports will always resolve
     "import/no-unresolved": [2, { "caseSensitive": true }],
     //These three are kind of annoying so turned them off
@@ -42,5 +48,15 @@
     "prefer-const": "error",
     "require-atomic-updates": "error",
     "no-return-await": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["tests/**"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"],
+      "rules": {
+        "jest/no-identical-title": "error"
+      }
+    }
+  ]
 }

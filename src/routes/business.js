@@ -6,6 +6,12 @@ import jwt from '../tools/jwt.js';
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
 
+console.log(_.isString('hello'));
+console.log(_.isString('') && !_.isEmpty(''));
+console.log(_.isString('          ') && _.isEmpty('          '));
+console.log(_.isString('          t'));
+console.log(_.isString('          t           '));
+
 router.get('/:id', async (request, response, next) => {
   try {
     if (!request.params.id) {
@@ -26,7 +32,7 @@ router.get('/:id', async (request, response, next) => {
     }
 
     _.pick(business, ['name', 'email', 'profile']); //etc
-    response.json(business);
+    response.json({ business });
   } catch (error) {
     next(error);
   }
@@ -46,14 +52,9 @@ router.post('/', async (request, response, next) => {
         type,
         mission,
       },
-      select: {
-        name: true,
-        type: true,
-        mission: true,
-      },
     });
 
-    response.json(newBusiness);
+    response.json({ business: newBusiness });
   } catch (error) {
     next(error);
   }
@@ -110,9 +111,7 @@ router.get('/favorites', async (request, response, next) => {
     if (!request.headers.authorization) {
       throw new AuthenticationError('Access token missing');
     }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-    const userID = payload.id;
+
     const user = await Prisma.user.findUnique({
       where: {
         id: request.authorizedUser.id,
@@ -126,7 +125,9 @@ router.get('/favorites', async (request, response, next) => {
       },
     });
     if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
+      throw new RequestError(
+        `Could not find user with id ${request.authorizedUser.id}`
+      );
     }
     response.json(user.favorites.map(favorite => favorite.business));
   } catch (error) {
@@ -139,12 +140,10 @@ router.get('/connected', async (request, response, next) => {
     if (!request.headers.authorization) {
       throw new AuthenticationError('Access token missing');
     }
-    const accessToken = request.headers.authorization.split(' ')[1];
-    const payload = await jwt.verify(accessToken);
-    const userID = payload.id;
+
     const user = await Prisma.user.findUnique({
       where: {
-        id: userID,
+        id: request.authorizedUser.id,
       },
       include: {
         connectedBusinesses: true,
@@ -152,7 +151,9 @@ router.get('/connected', async (request, response, next) => {
     });
 
     if (!user) {
-      throw new RequestError(`Could not find user with id ${userID}`);
+      throw new RequestError(
+        `Could not find user with id ${request.authorizedUser.id}`
+      );
     }
 
     response.json(user.connectedBusinesses);
