@@ -14,7 +14,9 @@
     "format": "prettier --write --ignore-path=.gitignore \"src/**/*.{js,jsx}\"",
     "prisma": "npx prisma db push && npx prisma studio",
     "prisma:reset": "npx prisma db push && npx prisma db seed && npx prisma studio",
-    "test": "npx majestic"
+    "test": "npx majestic",
+    "test:cli": "jest --watch",
+    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --ci --reporters='default' --reporters='./tests/infra/githubActionsReporter'"
   },
   "author": "Laura Boettcher, Pablo Najera",
   "license": "ISC",
