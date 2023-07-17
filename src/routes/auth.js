@@ -136,12 +136,13 @@ router.post('/refresh', async (request, res, next) => {
     next(error);
   }
 });
-router.post('/forgot-password', async (request, response) => {
-  try {
-    if (!request.body.email) {
-      throw new RequestError('Must provide a valid email');
-    }
+router.post('/forgot-password', async (request, response, next) => {
+  if (!request.body.email) {
+    next(new RequestError('Must provide a valid email'));
+    return;
+  }
 
+  try {
     const user = await Prisma.user.findUnique({
       where: {
         email: request.body.email.toLowerCase(),
@@ -160,7 +161,7 @@ router.post('/forgot-password', async (request, response) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    Logger.error(error);
   } finally {
     response.json({ message: 'Password reset request has been processed.' });
   }
