@@ -54,21 +54,34 @@ router.post('/', async (request, response, next) => {
   }
 });
 
+// this is a patch request to update a business by id
 router.patch('/:id', async (request, response, next) => {
   try {
+    // check if id is valid
     if (!request.params.id) {
       throw new RequestError('Must provide a valid id');
     }
+
+    // we use lodash to pick the fields we want to update
+    // this is a security measure to prevent users from updating fields they shouldn't
     const cleanbody = _.pick(request.body, ['name', 'type', 'mission', '']);
+
+    // if the body is empty, throw an error
+    // because this means the user only provided fields that shouldn't be updated
+    // (actually we should also do this in the user PATCH as well)
     if (_.isEmpty(cleanbody)) {
       throw new RequestError('Nothing to update');
     }
+
+    // update the business
     await Prisma.business.update({
       where: {
         id: request.params.id,
       },
       data: cleanbody,
     });
+
+    // send a response
     response.json({
       message: 'Succesfully updated business',
     });
