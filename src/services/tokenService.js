@@ -11,6 +11,10 @@ import { AuthenticationError } from '../constants/commonErrors.js';
  * @param {String} Info.userId - User's id
  * @return {JsonWebToken} Signed refresh token
  */
+export default {
+  getSignedRefreshToken,
+  extractRefreshToken,
+};
 export async function getSignedRefreshToken({ request, userId }) {
   const refreshToken = await Prisma.refreshTokens.create({
     data: {
@@ -34,7 +38,8 @@ export async function getSignedRefreshToken({ request, userId }) {
  * @param {JsonWebToken} signedRefreshToken
  * @returns {RefreshToken} RefreshToken database object
  */
-export async function extractRefreshToken(signedRefreshToken) {
+
+export async function extractRefreshToken(signedRefreshToken, request) {
   const refreshTokenInfo = await jwt.verify(signedRefreshToken);
   const refreshToken = await Prisma.refreshTokens.findUnique({
     where: { id: refreshTokenInfo?.refreshTokenId },
@@ -42,10 +47,18 @@ export async function extractRefreshToken(signedRefreshToken) {
   if (!refreshToken) {
     throw new AuthenticationError('Refresh token not found');
   }
+
+  const ipAddress =
+    request.headers['x-forwarded-for'] || request.socket.remoteAddress;
+  const userAgent = request.headers['user-agent'];
+  if (
+    refreshToken.ipAddress !== ipAddress ||
+    refreshToken.userAgent !== userAgent
+  ) {
+    throw new AuthenticationError(
+      'Security issue found with refresh token. Please sign in again to get a new refresh token.'
+    );
+  }
+
   return refreshToken;
 }
-
-export default {
-  getSignedRefreshToken,
-  extractRefreshToken,
-};
