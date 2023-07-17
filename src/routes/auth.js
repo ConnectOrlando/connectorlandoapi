@@ -25,7 +25,7 @@ router.post('/signup', async (request, response, next) => {
     }
     const user = await Prisma.user.findUnique({
       where: {
-        email: request.body.email,
+        email: request.body.email.toLowerCase(),
       },
     });
     if (user) {

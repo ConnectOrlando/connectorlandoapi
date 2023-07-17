@@ -54,19 +54,60 @@ describe('Auth Routes', () => {
       await prisma.user.create({
         data: {
           name: 'test user',
-          email: 'TEST@example.com',
+          email: 'test@example.com',
           password: 'test password',
         },
       });
 
       const response = await request.post('/auth/signup').send({
         name: 'test user',
-        email: 'TEST@example.com',
+        email: 'test@example.com',
         password: 'test password',
       });
       expect(response.body.error.message).toBe(
         'An account with that email already exists'
       );
+    });
+
+    it('should be case insensitive', async () => {
+      await prisma.user.create({
+        data: {
+          name: 'test user',
+          email: 'test@example.com',
+          password: 'test password',
+        },
+      });
+
+      const response = await request.post('/auth/signup').send({
+        name: 'test user',
+        email: 'tESt@example.com',
+        password: 'test password',
+      });
+      expect(response.body.error.message).toBe(
+        'An account with that email already exists'
+      );
+    });
+
+    it('should allow .edu emails', async () => {
+      const response = await request.post('/auth/signup').send({
+        name: 'test user',
+        email: 'test@example.edu',
+        password: 'test password',
+      });
+      expect(response.status).toBe(200);
+      expect(typeof response.body.accessToken).toBe('string');
+      expect(typeof response.body.refreshToken).toBe('string');
+    });
+
+    it('should allow .tech emails', async () => {
+      const response = await request.post('/auth/signup').send({
+        name: 'test user',
+        email: 'test@example.tech',
+        password: 'test password',
+      });
+      expect(response.status).toBe(200);
+      expect(typeof response.body.accessToken).toBe('string');
+      expect(typeof response.body.refreshToken).toBe('string');
     });
   });
 });
