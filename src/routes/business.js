@@ -78,7 +78,6 @@ router.patch('/:id', async (request, response, next) => {
 });
 
 router.delete('/:id', async (request, response, next) => {
-  console.log('Here');
   try {
     if (!request.params.id) {
       throw new RequestError('Must provide a valid id');

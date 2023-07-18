@@ -116,7 +116,8 @@ router.post('/signout', async (request, response) => {
 router.post('/refresh', async (request, res, next) => {
   try {
     const refreshToken = await TokenService.extractRefreshToken(
-      request.body.refreshToken
+      request.body.refreshToken,
+      request
     );
     const user = await Prisma.user.findUnique({
       where: { id: refreshToken.userId },
@@ -129,13 +130,13 @@ router.post('/refresh', async (request, res, next) => {
     if (!user) {
       throw new AuthenticationError('Invalid refresh token');
     }
-
     const accessToken = jwt.sign(
       {
         id: user.id,
       },
       '15min'
     );
+
     res.json({ accessToken });
   } catch (error) {
     next(error);
