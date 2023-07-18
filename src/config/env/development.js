@@ -6,5 +6,6 @@ export default {
     '/auth/signin',
     '/auth/refresh',
     '/auth/signout',
+    '/auth/forgot-password',
   ],
 };
