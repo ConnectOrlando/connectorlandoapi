@@ -5,12 +5,10 @@ import {
   AuthenticationError,
   AuthorizationError,
 } from '../constants/commonErrors.js';
+import _ from 'lodash-es';
 
-export default async (request, res, next) => {
-  if (
-    config?.PUBLIC_ROUTES?.includes('*') ||
-    config?.PUBLIC_ROUTES?.includes(request.path)
-  ) {
+export default async (request, response, next) => {
+  if (checkIfRouteIsPublic(request.path)) {
     next();
   } else {
     try {
@@ -34,3 +32,12 @@ export default async (request, res, next) => {
     }
   }
 };
+
+function checkIfRouteIsPublic(route) {
+  if (_.last(route) === '/') {
+    route = route.slice(0, -1);
+  }
+  return (
+    config?.PUBLIC_ROUTES?.includes('*') || config.PUBLIC_ROUTES.includes(route)
+  );
+}
