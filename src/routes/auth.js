@@ -8,9 +8,10 @@ import jwt from '../tools/jwt.js';
 import Prisma from '../tools/prisma.js';
 import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
+import emailService from '../services/emailService.js';
+import config from '../config.js';
 
 const router = express.Router();
-
 router.post('/signup', async (request, response, next) => {
   try {
     if (!request.body.name || !request.body.email || !request.body.password) {
@@ -135,5 +136,34 @@ router.post('/refresh', async (request, res, next) => {
     next(error);
   }
 });
+router.post('/forgot-password', async (request, response, next) => {
+  if (!request.body.email) {
+    next(new RequestError('Must provide a valid email'));
+    return;
+  }
 
+  try {
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: request.body.email.toLowerCase(),
+      },
+    });
+
+    if (user) {
+      const resetToken = jwt.sign({ email: user.email }, '1w');
+
+      const resetLink = `${config.CLIENT_URL}/reset-password?-token=${resetToken}`;
+
+      await emailService.sendTextEmail({
+        to: user.email,
+        subject: 'Password Reset Request',
+        text: `Hi ${user.name},\n\nYou have requested to reset your password. Please click on the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.\n,\n ConnectOrlando`,
+      });
+    }
+  } catch (error) {
+    Logger.error(error);
+  } finally {
+    response.json({ message: 'Password reset request has been processed.' });
+  }
+});
 export default router;

@@ -1,39 +1,10 @@
 import _ from 'lodash-es';
 import { ArchivedError, RequestError } from '../constants/commonErrors.js';
-import bcrypt from 'bcrypt';
 import express from 'express';
 import Prisma from '../tools/prisma.js';
 
 import { AuthenticationError } from '../constants/commonErrors.js';
 const router = express.Router();
-
-router.post('/', async (request, response, next) => {
-  try {
-    if (!request.body.name || !request.body.email || !request.body.password) {
-      throw new RequestError('Must provide a valid name, email, and password');
-    }
-    const user = await Prisma.user.findUnique({
-      where: {
-        email: request.body.email,
-      },
-    });
-    if (user) {
-      throw new RequestError('Email already exists');
-    }
-
-    const passwordHash = await bcrypt.hash(request.body.password, 10);
-    const newUser = await Prisma.user.create({
-      data: {
-        name: request.body.name,
-        email: request.body.email.toLowerCase(),
-        password: passwordHash,
-      },
-    });
-    response.json(newUser);
-  } catch (error) {
-    next(error);
-  }
-});
 
 router.get('/', async (request, response, next) => {
   try {
