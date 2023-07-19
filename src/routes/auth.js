@@ -166,4 +166,38 @@ router.post('/forgot-password', async (request, response, next) => {
     response.json({ message: 'Password reset request has been processed.' });
   }
 });
+
+router.post('/reset-password', async (request, response, next) => {
+  const { token, newPassword } = request.body;
+
+  try {
+    const decodedToken = jwt.verify(token, '1w');
+    const userEmail = decodedToken.email;
+
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: userEmail.toLowerCase(),
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await Prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    response.json({ message: 'Password reset successful.' });
+  } catch {
+    next(new RequestError('Password reset not successful'));
+  }
+});
+
 export default router;
