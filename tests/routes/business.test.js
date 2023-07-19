@@ -104,4 +104,11 @@ describe('Business Routes', () => {
       );
     });
   });
+
+  describe('PATCH /business/:id', () => {
+    it('should require a valid id', async () => {
+      const response = await request.patch('/business').send({});
+      expect(response.body.error.message).toBe('Must provide a valid id');
+    });
+  });
 });
