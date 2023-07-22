@@ -106,9 +106,54 @@ describe('Business Routes', () => {
   });
 
   describe('PATCH /business/:id', () => {
-    it('should require a valid id', async () => {
-      const response = await request.patch('/business').send({});
-      expect(response.body.error.message).toBe('Must provide a valid id');
+    it('should only update allowed fields', async () => {
+      const orignalBusiness = await prisma.business.create({
+        data: {
+          name: 'Test Business',
+          type: 'Test Type',
+          mission: 'Test Mission',
+        },
+      });
+      const response = await request
+        .patch(`/business/${orignalBusiness.id}`)
+        .send({
+          name: 'new name',
+          gallery: 'new gallery',
+        });
+      expect(response.status).toBe(200);
+
+      const newBusiness = await prisma.business.findUnique({
+        where: {
+          id: orignalBusiness.id,
+        },
+      });
+      expect(newBusiness.name).toBe('new name');
+      expect(newBusiness.gallery).toBe(orignalBusiness.gallery);
+    });
+    // on line 135, why am I able to just provide a business id that doesn't exist?
+    it('should update nothing', async () => {
+      const response = await request.patch('/business/1234').send({});
+      expect(response.body.error.message).toBe('Nothing to update');
+    });
+
+    it('should update sucessfully', async () => {
+      const oldBusinessInfo = await prisma.business.create({
+        data: {
+          name: 'oldBusinessName',
+        },
+      });
+      const response = await request.patch('/business/1234').send({
+        name: 'newBusinessName',
+      });
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe('Successfully updated business');
+
+      const newBusinessInfo = await prisma.business.findUnique({
+        where: {
+          id: oldBusinessInfo.id,
+        },
+      });
+      expect(oldBusinessInfo.name).toBe(newBusinessInfo.name);
     });
   });
 });

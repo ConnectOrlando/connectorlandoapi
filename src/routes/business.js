@@ -56,10 +56,7 @@ router.post('/', async (request, response, next) => {
 
 router.patch('/:id', async (request, response, next) => {
   try {
-    if (!request.params.id) {
-      throw new RequestError('Must provide a valid id');
-    }
-    const cleanbody = _.pick(request.body, ['name', 'type', 'mission', '']);
+    const cleanbody = _.pick(request.body, ['name', 'type', 'mission']);
     if (_.isEmpty(cleanbody)) {
       throw new RequestError('Nothing to update');
     }
@@ -70,7 +67,7 @@ router.patch('/:id', async (request, response, next) => {
       data: cleanbody,
     });
     response.json({
-      message: 'Succesfully updated business',
+      message: 'Successfully updated business',
     });
   } catch (error) {
     next(error);
