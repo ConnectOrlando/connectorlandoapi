@@ -106,3 +106,4 @@ dist
 # Jest
 *.swn
 *.swo
+*.swp
