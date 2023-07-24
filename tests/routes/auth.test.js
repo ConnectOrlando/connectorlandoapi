@@ -133,7 +133,7 @@ describe('Auth Routes', () => {
 
     // Success test case
     it('should sign in a user with valid credentials', async () => {
-      const response = await request.post('/signin').send({
+      const response = await request.post('/auth/signin').send({
         email: 'test@example.com',
         password: 'password',
       });
@@ -144,7 +144,7 @@ describe('Auth Routes', () => {
 
     // Email test case
     it('should return an error if email is not provided', async () => {
-      const response = await request.post('/signin').send({
+      const response = await request.post('/auth/signin').send({
         password: 'password',
       });
 
@@ -156,7 +156,7 @@ describe('Auth Routes', () => {
 
     // Password test case
     it('should return an error if password is not provided', async () => {
-      const response = await request.post('/signin').send({
+      const response = await request.post('/auth/signin').send({
         email: 'test@example.com',
       });
 
@@ -168,7 +168,7 @@ describe('Auth Routes', () => {
 
     // User does not exist test case
     it('should return an error if the user does not exist', async () => {
-      const response = await request.post('/signin').send({
+      const response = await request.post('/auth/signin').send({
         email: 'nonexistent@example.com',
         password: 'password',
       });
@@ -179,7 +179,7 @@ describe('Auth Routes', () => {
 
     // Invalid password test case
     it('should return an error if the password is incorrect', async () => {
-      const response = await request.post('/signin').send({
+      const response = await request.post('/auth/signin').send({
         email: 'test@example.com',
         password: 'incorrect_password',
       });
