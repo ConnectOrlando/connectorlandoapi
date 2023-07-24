@@ -8,6 +8,7 @@ import morganMiddleware from './middleware/morgan.js';
 import errorHandler from './middleware/errorHandler.js';
 import config from './config.js';
 import tokenAuth from './middleware/tokenAuth.js';
+import publicRoutes from './middleware/publicRoutes.js';
 
 export default express()
   .use(cookieParser())
@@ -35,6 +36,7 @@ export default express()
         </div>
       `);
   })
+  .use(publicRoutes)
   .use(tokenAuth)
   .use('/', routes)
   .use(errorHandler)
