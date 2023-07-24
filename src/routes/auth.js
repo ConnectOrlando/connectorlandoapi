@@ -179,7 +179,7 @@ router.post('/reset-password', async (request, response, next) => {
   const { token, newPassword } = request.body;
 
   try {
-    const decodedToken = jwt.verify(token, '1w');
+    const decodedToken = jwt.verify(token, 'your-secret-key');
     const userEmail = decodedToken.email;
 
     const user = await Prisma.user.findUnique({
@@ -189,7 +189,7 @@ router.post('/reset-password', async (request, response, next) => {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new RequestError('User not found');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -202,9 +202,9 @@ router.post('/reset-password', async (request, response, next) => {
       },
     });
 
-    response.json({ message: 'Password reset successful.' });
-  } catch {
-    next(new RequestError('Password reset not successful'));
+    response.json({ message: 'Password reset successful' });
+  } catch (error) {
+    next(error);
   }
 });
 
