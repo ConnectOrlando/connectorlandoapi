@@ -8,6 +8,7 @@ import jwt from '../tools/jwt.js';
 import Prisma from '../tools/prisma.js';
 import TokenService from '../services/tokenService.js';
 import Logger from '../tools/logger.js';
+import validator from 'validator';
 import emailService from '../services/emailService.js';
 import config from '../config.js';
 
@@ -15,12 +16,18 @@ const router = express.Router();
 
 router.post('/signup', async (request, response, next) => {
   try {
-    if (!request.body.name || !request.body.email || !request.body.password) {
-      throw new RequestError('Must provide a valid name, email, and password');
+    if (!request.body.name) {
+      throw new RequestError('Must provide a valid name');
+    }
+    if (!request.body.password) {
+      throw new RequestError('Must provide a valid password');
+    }
+    if (!request.body.email || !validator.isEmail(request.body.email)) {
+      throw new RequestError('Must provide a valid email');
     }
     const user = await Prisma.user.findUnique({
       where: {
-        email: request.body.email,
+        email: request.body.email.toLowerCase(),
       },
     });
     if (user) {
