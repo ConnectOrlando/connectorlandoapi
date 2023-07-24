@@ -5,7 +5,6 @@ const ALLOWED_ERRORS = new Set(['ValidationError']);
 
 export default (error, request, res, next) => {
   if (error) {
-    Logger.debug('Error caught in error handler', error);
     let { name, message, statusCode } = error;
     if (error.name === 'TokenExpiredError') {
       statusCode = 401;
