@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
-
+import bcrypt from 'bcrypt';
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -133,13 +133,22 @@ describe('Auth Routes', () => {
 
     // Success test case
     it('should sign in a user with valid credentials', async () => {
+      const passwordHash = await bcrypt.hash('password', 10);
+      await prisma.user.create({
+        data: {
+          name: 'name',
+          email: 'realemail@gmail.com',
+          password: passwordHash,
+        },
+      });
       const response = await request.post('/auth/signin').send({
-        email: 'test@example.com',
+        email: 'realemail@gmail.com',
         password: 'password',
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.accessToken).toBeDefined();
+      expect(typeof response.body.accessToken).toBe('string');
+      expect(typeof response.body.refreshToken).toBe('string');
     });
 
     // Email test case
@@ -173,7 +182,7 @@ describe('Auth Routes', () => {
         password: 'password',
       });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(400);
       expect(response.body.error.message).toBe('Account does not exist');
     });
 
