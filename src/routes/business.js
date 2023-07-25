@@ -60,12 +60,18 @@ router.patch('/:id', async (request, response, next) => {
     if (_.isEmpty(cleanbody)) {
       throw new RequestError('Nothing to update');
     }
-    await Prisma.business.update({
+    const business = await Prisma.business.update({
       where: {
         id: request.params.id,
       },
       data: cleanbody,
     });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
     response.json({
       message: 'Successfully updated business',
     });

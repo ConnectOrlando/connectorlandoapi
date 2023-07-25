@@ -107,7 +107,7 @@ describe('Business Routes', () => {
 
   describe('PATCH /business/:id', () => {
     it('should only update allowed fields', async () => {
-      const orignalBusiness = await prisma.business.create({
+      const originalBusiness = await prisma.business.create({
         data: {
           name: 'Test Business',
           type: 'Test Type',
@@ -115,7 +115,7 @@ describe('Business Routes', () => {
         },
       });
       const response = await request
-        .patch(`/business/${orignalBusiness.id}`)
+        .patch(`/business/${originalBusiness.id}`)
         .send({
           name: 'new name',
           gallery: 'new gallery',
@@ -124,14 +124,14 @@ describe('Business Routes', () => {
 
       const newBusiness = await prisma.business.findUnique({
         where: {
-          id: orignalBusiness.id,
+          id: originalBusiness.id,
         },
       });
       expect(newBusiness.name).toBe('new name');
-      expect(newBusiness.gallery).toBe(orignalBusiness.gallery);
+      expect(newBusiness.gallery).toBe(originalBusiness.gallery);
     });
-    // on line 135, why am I able to just provide a business id that doesn't exist?
-    it('should update nothing', async () => {
+
+    it('should return error if no fields are updated', async () => {
       const response = await request.patch('/business/1234').send({});
       expect(response.body.error.message).toBe('Nothing to update');
     });
@@ -142,9 +142,11 @@ describe('Business Routes', () => {
           name: 'oldBusinessName',
         },
       });
-      const response = await request.patch('/business/1234').send({
-        name: 'newBusinessName',
-      });
+      const response = await request
+        .patch(`/business/${oldBusinessInfo.id}`)
+        .send({
+          name: 'newBusinessName',
+        });
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Successfully updated business');
 
@@ -153,7 +155,16 @@ describe('Business Routes', () => {
           id: oldBusinessInfo.id,
         },
       });
-      expect(oldBusinessInfo.name).toBe(newBusinessInfo.name);
+      expect(newBusinessInfo.name).toBe('newBusinessName');
+    });
+
+    it('should return error when provided with invalid id', async () => {
+      const response = await request.patch('/business/1234').send({
+        name: 'newName',
+      });
+      expect(response.body.error.message).toBe(
+        'Could not find business with id 1234'
+      );
     });
   });
 });
