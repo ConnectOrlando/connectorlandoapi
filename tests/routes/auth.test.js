@@ -112,25 +112,6 @@ describe('Auth Routes', () => {
   });
 
   describe('POST /signin', () => {
-    let testUser;
-
-    beforeAll(async () => {
-      testUser = await prisma.user.create({
-        data: {
-          email: 'test@example.com',
-          password: 'password',
-        },
-      });
-    });
-
-    afterAll(async () => {
-      await prisma.user.delete({
-        where: {
-          id: testUser.id,
-        },
-      });
-    });
-
     // Success test case
     it('should sign in a user with valid credentials', async () => {
       const passwordHash = await bcrypt.hash('password', 10);
@@ -183,20 +164,34 @@ describe('Auth Routes', () => {
       });
 
       expect(response.status).toBe(400);
-      expect(response.body.error.message).toBe('Account does not exist');
+      expect(response.body.error.message).toBe(
+        'Cannot verify user information'
+      );
     });
-
-    // Invalid password test case
     it('should return an error if the password is incorrect', async () => {
+      const passwordHash = await bcrypt.hash('password', 10);
+      const testUser = await prisma.user.create({
+        data: {
+          email: 'test@example.com',
+          password: passwordHash,
+        },
+      });
+
       const response = await request.post('/auth/signin').send({
         email: 'test@example.com',
         password: 'incorrect_password',
       });
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
       expect(response.body.error.message).toBe(
         'Cannot verify login information'
       );
+
+      await prisma.user.delete({
+        where: {
+          id: testUser.id,
+        },
+      });
     });
   });
 });
