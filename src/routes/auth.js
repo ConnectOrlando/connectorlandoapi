@@ -41,16 +41,10 @@ router.post('/signup', async (request, response, next) => {
         password: passwordHash,
       },
     });
-    const accessToken = jwt.sign(
-      {
-        id: newUser.id,
-      },
-      '1w'
-    );
-
+    const accessToken = await TokenService.createAccessToken(newUser);
     const refreshToken = await TokenService.getSignedRefreshToken({
       request,
-      userId: newUser.id,
+      user: newUser,
     });
     response.json({ accessToken, refreshToken });
   } catch (error) {
@@ -78,16 +72,11 @@ router.post('/signin', async (request, response, next) => {
     if (!isAuthenticated) {
       throw new AuthenticationError('Cannot verify login information');
     }
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-      },
-      '15min'
-    );
+    const accessToken = await TokenService.createAccessToken(user);
 
     const refreshToken = await TokenService.getSignedRefreshToken({
       request,
-      userId: user.id,
+      user,
     });
 
     response.json({ accessToken, refreshToken });
@@ -132,12 +121,7 @@ router.post('/refresh', async (request, res, next) => {
     if (!user) {
       throw new AuthenticationError('Invalid refresh token');
     }
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-      },
-      '15min'
-    );
+    const accessToken = await TokenService.createAccessToken(user);
 
     res.json({ accessToken });
   } catch (error) {
