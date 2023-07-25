@@ -90,6 +90,7 @@
     "**/.project": true,
     "**/.settings": true,
     "**/*.swn": true,
+    "**/*.swp": true,
     "**/*.swo": true
   },
   "workbench.startupEditor": "none",
