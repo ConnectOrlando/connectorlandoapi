@@ -2,6 +2,7 @@ import supertest from 'supertest';
 import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
 import bcrypt from 'bcrypt';
+
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -110,9 +111,29 @@ describe('Auth Routes', () => {
       expect(typeof response.body.refreshToken).toBe('string');
     });
   });
+});
+
+describe('Sign-in Routes', () => {
+  let testUser;
+
+  beforeAll(async () => {
+    testUser = await prisma.user.create({
+      data: {
+        email: 'test@example.com',
+        password: 'password',
+      },
+    });
+  });
+
+  afterAll(async () => {
+    await prisma.user.delete({
+      where: {
+        id: testUser.id,
+      },
+    });
+  });
 
   describe('POST /signin', () => {
-    // Success test case
     it('should sign in a user with valid credentials', async () => {
       const passwordHash = await bcrypt.hash('password', 10);
       await prisma.user.create({
@@ -131,8 +152,6 @@ describe('Auth Routes', () => {
       expect(typeof response.body.accessToken).toBe('string');
       expect(typeof response.body.refreshToken).toBe('string');
     });
-
-    // Email test case
     it('should return an error if email is not provided', async () => {
       const response = await request.post('/auth/signin').send({
         password: 'password',
@@ -143,8 +162,6 @@ describe('Auth Routes', () => {
         'Must provide a valid email and password'
       );
     });
-
-    // Password test case
     it('should return an error if password is not provided', async () => {
       const response = await request.post('/auth/signin').send({
         email: 'test@example.com',
@@ -155,8 +172,6 @@ describe('Auth Routes', () => {
         'Must provide a valid email and password'
       );
     });
-
-    // User does not exist test case
     it('should return an error if the user does not exist', async () => {
       const response = await request.post('/auth/signin').send({
         email: 'nonexistent@example.com',
