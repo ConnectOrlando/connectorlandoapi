@@ -63,7 +63,7 @@ router.post('/signin', async (request, response, next) => {
       },
     });
     if (!user) {
-      throw new RequestError('Account does not exist');
+      throw new AuthenticationError('Cannot verify login information');
     }
     const isAuthenticated = await bcrypt.compare(
       request.body.password,

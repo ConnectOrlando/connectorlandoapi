@@ -163,9 +163,9 @@ describe('Auth Routes', () => {
         password: 'password',
       });
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(401);
       expect(response.body.error.message).toBe(
-        'Cannot verify user information'
+        'Cannot verify login information'
       );
     });
     it('should return an error if the password is incorrect', async () => {
@@ -182,7 +182,7 @@ describe('Auth Routes', () => {
         password: 'incorrect_password',
       });
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(401);
       expect(response.body.error.message).toBe(
         'Cannot verify login information'
       );
