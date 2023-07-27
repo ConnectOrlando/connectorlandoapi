@@ -56,21 +56,24 @@ router.post('/', async (request, response, next) => {
 
 router.patch('/:id', async (request, response, next) => {
   try {
-    if (!request.params.id) {
-      throw new RequestError('Must provide a valid id');
-    }
-    const cleanbody = _.pick(request.body, ['name', 'type', 'mission', '']);
+    const cleanbody = _.pick(request.body, ['name', 'type', 'mission']);
     if (_.isEmpty(cleanbody)) {
       throw new RequestError('Nothing to update');
     }
-    await Prisma.business.update({
+    const business = await Prisma.business.update({
       where: {
         id: request.params.id,
       },
       data: cleanbody,
     });
+
+    if (!business) {
+      throw new RequestError(
+        `Could not find business with id ${request.params.id}`
+      );
+    }
     response.json({
-      message: 'Succesfully updated business',
+      message: 'Successfully updated business',
     });
   } catch (error) {
     next(error);
