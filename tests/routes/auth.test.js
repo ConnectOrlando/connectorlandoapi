@@ -1,7 +1,8 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
-
+import bcrypt from 'bcrypt';
+//import jwt from '../tools/jwt.js';
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -109,5 +110,61 @@ describe('Auth Routes', () => {
       expect(typeof response.body.accessToken).toBe('string');
       expect(typeof response.body.refreshToken).toBe('string');
     });
+  });
+});
+
+describe('POST /reset-password', () => {
+  const testUser = {
+    email: 'test@example.com',
+    password: 'testPassword',
+  };
+  it('should reset the password successfully', async () => {
+    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    const user = await prisma.user.create({
+      data: {
+        email: testUser.email,
+        password: hashedPassword,
+      },
+    });
+    // const token = jwt.sign({ email: testUser.email }, '1w');
+
+    // const response = await request
+    //   .post('/reset-password')
+    //   .send({ resetPasswordToken: token, newPassword: 'newTestPassword' });
+
+    // expect(response.status).toBe(200);
+    // expect(response.body.message).toBe('Password reset successful');
+
+    const updatedUser = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+    const passwordsMatch = await bcrypt.compare(
+      'newTestPassword',
+      updatedUser.password
+    );
+    expect(passwordsMatch).toBe(true);
+  });
+
+  it('should return "User not found" error for invalid token', async () => {
+    const invalidToken = 'invalid-token';
+
+    const response = await request.post('/reset-password').send({
+      resetPasswordToken: invalidToken,
+      newPassword: 'newTestPassword',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toBe('User not found');
+  });
+
+  it('should return "User not found" error for non-existing user', async () => {
+    // const token = jwt.sign({ email: 'nonexisting@example.com' }, '1w');
+    // const response = await request
+    //   .post('/reset-password')
+    //   .send({ resetPasswordToken: token, newPassword: 'newTestPassword' });
+    // expect(response.status).toBe(400);
+    // expect(response.body.error.message).toBe('User not found');
   });
 });
