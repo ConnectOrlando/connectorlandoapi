@@ -25,7 +25,7 @@ router.get('/:id', async (request, response, next) => {
       throw new ArchivedError('Business account already deleted');
     }
 
-    _.pick(business, ['name', 'email', 'profile']); //etc
+    _.pick(business, ['name', 'email', 'profile', 'owner']);
     response.json({ business });
   } catch (error) {
     next(error);
