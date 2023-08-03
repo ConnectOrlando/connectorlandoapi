@@ -46,7 +46,33 @@ router.post('/signup', async (request, response, next) => {
       request,
       user: newUser,
     });
+
+    const confirmToken = jwt.sign({ email: newUser.email }, '1y');
+
+    const confirmLink = `${config.CLIENT_URL}/confirm-email?token=${confirmToken}`;
+
+    await emailService.sendHtmlEmail({
+      to: newUser.email,
+      subject: 'Confirm your Email',
+      html: `<p>Hello ${newUser.name},<br/><br/>This is an automated message sent to you to confirm your email. Please click this <a href=${confirmLink}>link</a> confirm your email</p>`,
+    });
     response.json({ accessToken, refreshToken });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/confirm-email', async (request, response, next) => {
+  const { token } = request.query;
+
+  try {
+    const data = await jwt.verify(token, 'REPLACE_WITH_RANDOM_SECRETKEY');
+
+    if (!data.token) {
+      throw new RequestError('Invalid confirmation link');
+    }
+
+    response.json({ message: 'Email successfully confirmed' });
   } catch (error) {
     next(error);
   }

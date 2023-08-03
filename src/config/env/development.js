@@ -8,4 +8,5 @@ export default {
     '/auth/signout',
     '/auth/forgot-password',
   ],
+  CLIENT_URL: 'https://app.connectorlando.tech',
 };
