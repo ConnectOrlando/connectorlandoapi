@@ -68,7 +68,22 @@ router.post('/confirm-email', async (request, response, next) => {
   try {
     const data = await jwt.verify(token, 'REPLACE_WITH_RANDOM_SECRETKEY');
 
-    if (!data.token) {
+    if (data.token) {
+      const confirmedUser = await Prisma.user.findUnique({
+        where: {
+          email: data.email,
+        },
+      });
+
+      await Prisma.user.update({
+        where: {
+          email: confirmedUser.email,
+        },
+        data: {
+          isEmailVerified: true,
+        },
+      });
+    } else {
       throw new RequestError('Invalid confirmation link');
     }
 
