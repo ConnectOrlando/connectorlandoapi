@@ -63,21 +63,13 @@ router.post('/signup', async (request, response, next) => {
 });
 
 router.post('/confirm-email', async (request, response, next) => {
-  const { token } = request.query;
-
   try {
-    const data = await jwt.verify(token, 'REPLACE_WITH_RANDOM_SECRETKEY');
+    const payload = await jwt.verify(request.query.token);
 
-    if (data.token) {
-      const confirmedUser = await Prisma.user.findUnique({
-        where: {
-          email: data.email,
-        },
-      });
-
+    if (payload.email) {
       await Prisma.user.update({
         where: {
-          email: confirmedUser.email,
+          email: payload.email,
         },
         data: {
           isEmailVerified: true,
