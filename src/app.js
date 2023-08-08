@@ -17,7 +17,7 @@ export default express()
   .use(
     cors({
       origin: config.CORS_WHITELIST ?? config.BASE_URL,
-      methods: 'GET,PUT,POST,DELETE',
+      methods: 'GET,PUT,POST,DELETE,PATCH',
       allowedHeaders: 'Content-Type, Authorization',
     })
   )
