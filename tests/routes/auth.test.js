@@ -1,12 +1,17 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
+import { jest } from '@jest/globals';
 
 const request = supertest(app);
 
 describe('Auth Routes', () => {
   describe('POST /auth/signup', () => {
     it('should create user account', async () => {
+      jest.mock('../../src/services/emailService.js', () => ({
+        sendHtmlEmail: () => true,
+      }));
+
       const response = await request.post('/auth/signup').send({
         name: 'Test User',
         email: 'test@example.com',
