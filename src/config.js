@@ -12,8 +12,8 @@ function initialize() {
     dotenv.config({ override: true });
     processEnvironmentVariables();
     processCorsWhitelist();
+    CONFIG = ObjectUtil.finalize(CONFIG);
   }
-  return ObjectUtil.finalize(CONFIG);
 }
 
 function parseDotEnvironmentVariables() {
