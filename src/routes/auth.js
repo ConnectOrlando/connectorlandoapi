@@ -46,7 +46,41 @@ router.post('/signup', async (request, response, next) => {
       request,
       user: newUser,
     });
+
+    const confirmToken = jwt.sign({ email: newUser.email }, '1y');
+
+    const confirmLink = `${config.CLIENT_URL}/confirm-email?token=${confirmToken}`;
+
+    await emailService.sendHtmlEmail({
+      to: newUser.email,
+      subject: 'Confirm your Email',
+      html: `<p>Hello ${newUser.name},<br/><br/>This is an automated message sent to you to confirm your email. Please click the link below to confirm your email<br><br><a href=${confirmLink}>Confirm</a></p>`,
+    });
+
     response.json({ accessToken, refreshToken });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/confirm-email', async (request, response, next) => {
+  try {
+    const payload = await jwt.verify(request.query.token);
+
+    if (payload.email) {
+      await Prisma.user.update({
+        where: {
+          email: payload.email,
+        },
+        data: {
+          isEmailVerified: true,
+        },
+      });
+    } else {
+      throw new RequestError('Invalid confirmation link');
+    }
+
+    response.json({ message: 'Email successfully confirmed' });
   } catch (error) {
     next(error);
   }
