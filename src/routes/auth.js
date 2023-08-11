@@ -160,10 +160,10 @@ router.post('/forgot-password', async (request, response, next) => {
 });
 
 router.post('/reset-password', async (request, response, next) => {
-  const { Resetpasswordtoken, newPassword } = request.body;
+  const { resetPasswordToken, newPassword } = request.body;
 
   try {
-    const decodedToken = jwt.verify(Resetpasswordtoken, 'your-secret-key');
+    const decodedToken = jwt.verify(resetPasswordToken);
     const userEmail = decodedToken.email;
 
     const user = await Prisma.user.findUnique({
