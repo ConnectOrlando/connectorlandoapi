@@ -54,7 +54,7 @@ router.post('/signup', async (request, response, next) => {
     await emailService.sendHtmlEmail({
       to: newUser.email,
       subject: 'Confirm your Email',
-      html: `<p>Hello ${newUser.name},<br/><br/>This is an automated message sent to you to confirm your email. Please click the link below to confirm your email<br><br><a href=${confirmLink}>Confirm</a></p>`,
+      html: `<p>Hello ${newUser.name},<br/><br/>This is an automated message sent to you to confirm your email. Please click the link below to confirm your email.<br><br><a href=${confirmLink}>Confirm</a></p>`,
     });
 
     response.json({ accessToken, refreshToken });

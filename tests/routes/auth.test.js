@@ -6,13 +6,13 @@ import bcrypt from 'bcrypt';
 
 const request = supertest(app);
 
+jest.mock('../../src/services/emailService.js', () => ({
+  sendHtmlEmail: () => true,
+}));
+
 describe('Auth Routes', () => {
   describe('POST /auth/signup', () => {
     it('should create user account', async () => {
-      jest.mock('../../src/services/emailService.js', () => ({
-        sendHtmlEmail: () => true,
-      }));
-
       const response = await request.post('/auth/signup').send({
         name: 'Test User',
         email: 'test@example.com',
