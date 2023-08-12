@@ -111,122 +111,80 @@ describe('Auth Routes', () => {
       expect(typeof response.body.refreshToken).toBe('string');
     });
   });
-});
 
-describe('Sign-in Routes', () => {
-  let testUser;
-
-  beforeAll(async () => {
-    testUser = await prisma.user.create({
-      data: {
-        email: 'test@example.com',
+  describe('POST /auth/signin', () => {
+    it('should sign in a user with valid credentials', async () => {
+      const passwordHash = await bcrypt.hash('password', 10);
+      await prisma.user.create({
+        data: {
+          name: 'name',
+          email: 'realemail@gmail.com',
+          password: passwordHash,
+        },
+      });
+      const response = await request.post('/auth/signin').send({
+        email: 'realemail@gmail.com',
         password: 'password',
-      },
-    });
-  });
+      });
 
-  afterAll(async () => {
-    await prisma.user.delete({
-      where: {
-        id: testUser.id,
-      },
+      expect(response.status).toBe(200);
+      expect(typeof response.body.accessToken).toBe('string');
+      expect(typeof response.body.refreshToken).toBe('string');
     });
-  });
-  describe('Sign-in Routes', () => {
-    let testUser;
 
-    beforeAll(async () => {
-      testUser = await prisma.user.create({
+    it('should return an error if email is not provided', async () => {
+      const response = await request.post('/auth/signin').send({
+        password: 'password',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe(
+        'Must provide a valid email and password'
+      );
+    });
+
+    it('should return an error if password is not provided', async () => {
+      const response = await request.post('/auth/signin').send({
+        email: 'test@example.com',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe(
+        'Must provide a valid email and password'
+      );
+    });
+
+    it('should return an error if the user does not exist', async () => {
+      const response = await request.post('/auth/signin').send({
+        email: 'nonexistent@example.com',
+        password: 'password',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe(
+        'Cannot verify user information'
+      );
+    });
+
+    it('should return an error if the password is incorrect', async () => {
+      const passwordHash = await bcrypt.hash('password', 10);
+      await prisma.user.create({
         data: {
           email: 'test@example.com',
-          password: 'password',
+          password: passwordHash,
         },
       });
-    });
 
-    afterAll(async () => {
-      await prisma.user.delete({
-        where: {
-          id: testUser.id,
-        },
+      const response = await request.post('/auth/signin').send({
+        email: 'test@example.com',
+        password: 'incorrect_password',
       });
-    });
 
-    describe('POST /signin', () => {
-      it('should sign in a user with valid credentials', async () => {
-        const passwordHash = await bcrypt.hash('password', 10);
-        await prisma.user.create({
-          data: {
-            name: 'name',
-            email: 'realemail@gmail.com',
-            password: passwordHash,
-          },
-        });
-        const response = await request.post('/auth/signin').send({
-          email: 'realemail@gmail.com',
-          password: 'password',
-        });
-
-        expect(response.status).toBe(200);
-        expect(typeof response.body.accessToken).toBe('string');
-        expect(typeof response.body.refreshToken).toBe('string');
-      });
-      it('should return an error if email is not provided', async () => {
-        const response = await request.post('/auth/signin').send({
-          password: 'password',
-        });
-
-        expect(response.status).toBe(400);
-        expect(response.body.error.message).toBe(
-          'Must provide a valid email and password'
-        );
-      });
-      it('should return an error if password is not provided', async () => {
-        const response = await request.post('/auth/signin').send({
-          email: 'test@example.com',
-        });
-
-        expect(response.status).toBe(400);
-        expect(response.body.error.message).toBe(
-          'Must provide a valid email and password'
-        );
-      });
-      it('should return an error if the user does not exist', async () => {
-        const response = await request.post('/auth/signin').send({
-          email: 'nonexistent@example.com',
-          password: 'password',
-        });
-
-        expect(response.status).toBe(400);
-        expect(response.body.error.message).toBe(
-          'Cannot verify user information'
-        );
-      });
-      it('should return an error if the password is incorrect', async () => {
-        const passwordHash = await bcrypt.hash('password', 10);
-        const testUser = await prisma.user.create({
-          data: {
-            email: 'test@example.com',
-            password: passwordHash,
-          },
-        });
-
-        const response = await request.post('/auth/signin').send({
-          email: 'test@example.com',
-          password: 'incorrect_password',
-        });
-
-        expect(response.status).toBe(401);
-        expect(response.body.error.message).toBe(
-          'Cannot verify login information'
-        );
-
-        await prisma.user.delete({
-          where: {
-            id: testUser.id,
-          },
-        });
-      });
+      expect(response.status).toBe(401);
+      expect(response.body.error.message).toBe(
+        'Cannot verify login information'
+        //password be 6 characters long and "valid email string"
+      );
     });
   });
 });
