@@ -113,7 +113,7 @@ describe('Auth Routes', () => {
   });
 });
 
-describe('POST /reset-password', () => {
+describe('POST /auth/reset-password', () => {
   const testUser = {
     email: 'test@example.com',
     password: 'testPassword',
@@ -129,7 +129,7 @@ describe('POST /reset-password', () => {
     const token = jwt.sign({ email: testUser.email }, '1w');
 
     const response = await request
-      .post('/reset-password')
+      .post('/auth/reset-password')
       .send({ resetPasswordToken: token, newPassword: 'newTestPassword' });
 
     expect(response.status).toBe(200);
@@ -150,7 +150,7 @@ describe('POST /reset-password', () => {
   it('should return "User not found" error for invalid token', async () => {
     const invalidToken = 'invalid-token';
 
-    const response = await request.post('/reset-password').send({
+    const response = await request.post('/auth/reset-password').send({
       resetPasswordToken: invalidToken,
       newPassword: 'newTestPassword',
     });
@@ -162,7 +162,7 @@ describe('POST /reset-password', () => {
   it('should return "User not found" error for non-existing user', async () => {
     const token = jwt.sign({ email: 'nonexisting@example.com' }, '1w');
     const response = await request
-      .post('/reset-password')
+      .post('/auth/reset-password')
       .send({ resetPasswordToken: token, newPassword: 'newTestPassword' });
     expect(response.status).toBe(400);
     expect(response.body.error.message).toBe('User not found');
