@@ -55,7 +55,7 @@ router.post('/signup', async (request, response, next) => {
 router.post('/signin', async (request, response, next) => {
   try {
     if (!request.body.email || !request.body.password) {
-      throw new RequestError('Must provide a valid email and password');
+      throw new RequestError('Must provide a valid email and password', 400);
     }
     const user = await Prisma.user.findUnique({
       where: {
@@ -63,7 +63,7 @@ router.post('/signin', async (request, response, next) => {
       },
     });
     if (!user) {
-      throw new RequestError('Cannot verify user information');
+      throw new RequestError('Cannot verify user information', 400);
     }
     const isAuthenticated = await bcrypt.compare(
       request.body.password,
@@ -78,6 +78,12 @@ router.post('/signin', async (request, response, next) => {
       request,
       user,
     });
+    if (request.body.password.length < 6) {
+      throw new RequestError(
+        'Password must be at least 6 characters long',
+        400
+      );
+    }
 
     response.json({ accessToken, refreshToken });
   } catch (error) {

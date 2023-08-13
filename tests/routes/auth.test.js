@@ -183,7 +183,30 @@ describe('Auth Routes', () => {
       expect(response.status).toBe(401);
       expect(response.body.error.message).toBe(
         'Cannot verify login information'
-        //password be 6 characters long and "valid email string"
+      );
+    });
+
+    it('should return an error if password is less than 6 characters', async () => {
+      const response = await request.post('/auth/signin').send({
+        email: 'test@example.com',
+        password: '12345',
+      });
+
+      expect(response.status).toBe(401);
+      expect(response.body.error.message).toBe(
+        'Cannot verify login information'
+      );
+    });
+
+    it('should return an error if email is not a valid email string', async () => {
+      const response = await request.post('/auth/signin').send({
+        email: 'invalid_email',
+        password: 'password',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe(
+        'Cannot verify user information'
       );
     });
   });
