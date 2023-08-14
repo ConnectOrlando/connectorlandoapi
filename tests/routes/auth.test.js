@@ -156,7 +156,7 @@ describe('POST /auth/reset-password', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error.message).toBe('User not found');
+    expect(response.body.error.message).toBe('Invalid reset password token');
   });
 
   it('should return "User not found" error for non-existing user', async () => {
