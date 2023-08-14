@@ -55,7 +55,7 @@ router.post('/signup', async (request, response, next) => {
 router.post('/signin', async (request, response, next) => {
   try {
     if (!request.body.email || !request.body.password) {
-      throw new RequestError('Must provide a valid email and password', 400);
+      throw new RequestError('Must provide a valid email and password');
     }
     const user = await Prisma.user.findUnique({
       where: {
@@ -63,7 +63,7 @@ router.post('/signin', async (request, response, next) => {
       },
     });
     if (!user) {
-      throw new RequestError('Cannot verify user information', 400);
+      throw new RequestError('Cannot verify user information');
     }
     const isAuthenticated = await bcrypt.compare(
       request.body.password,
