@@ -147,7 +147,7 @@ describe('POST /auth/reset-password', () => {
     expect(passwordsMatch).toBe(true);
   });
 
-  it('should return "User not found" error for invalid token', async () => {
+  it('should return error message for invalid token', async () => {
     const invalidToken = 'invalid-token';
 
     const response = await request.post('/auth/reset-password').send({
@@ -156,7 +156,9 @@ describe('POST /auth/reset-password', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error.message).toBe('Invalid reset password token');
+    expect(response.body.error.message).toBe(
+      'Reset token is invalid or has expired. Please request a new one.'
+    );
   });
 
   it('should return "User not found" error for non-existing user', async () => {
