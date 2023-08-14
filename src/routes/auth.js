@@ -79,10 +79,7 @@ router.post('/signin', async (request, response, next) => {
       user,
     });
     if (request.body.password.length < 6) {
-      throw new RequestError(
-        'Password must be at least 6 characters long',
-        400
-      );
+      throw new RequestError('Password must be at least 6 characters long');
     }
 
     response.json({ accessToken, refreshToken });
