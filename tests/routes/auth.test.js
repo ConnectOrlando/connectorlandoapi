@@ -3,12 +3,15 @@ import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
 import { jest } from '@jest/globals';
 import bcrypt from 'bcrypt';
+import emailService from '../../src/services/emailService.js';
 
 const request = supertest(app);
 
-jest.mock('../../src/services/emailService.js', () => ({
-  sendHtmlEmail: () => true,
-}));
+jest.mock('../../src/services/emailService.js', () => {
+  return {
+    sendHtmlEmail: jest.fn(() => true),
+  };
+});
 
 describe('Auth Routes', () => {
   describe('POST /auth/signup', () => {
@@ -21,6 +24,7 @@ describe('Auth Routes', () => {
       expect(response.status).toBe(200);
       expect(typeof response.body.accessToken).toBe('string');
       expect(typeof response.body.refreshToken).toBe('string');
+      expect(emailService.sendHtmlEmail).toHaveBeenCalled();
     });
 
     it('should require a name', async () => {
