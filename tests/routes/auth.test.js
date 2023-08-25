@@ -114,19 +114,19 @@ describe('Auth Routes', () => {
 });
 
 describe('POST /auth/reset-password', () => {
-  const testUser = {
+  const randomUser = {
     email: 'test@example.com',
     password: 'testPassword',
   };
   it('should reset the password successfully', async () => {
-    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    const hashedPassword = await bcrypt.hash(randomUser.password, 10);
     const user = await prisma.user.create({
       data: {
-        email: testUser.email,
+        email: randomUser.email,
         password: hashedPassword,
       },
     });
-    const token = jwt.sign({ email: testUser.email }, '1w');
+    const token = jwt.sign({ email: randomUser.email }, '1w');
 
     const response = await request
       .post('/auth/reset-password')
