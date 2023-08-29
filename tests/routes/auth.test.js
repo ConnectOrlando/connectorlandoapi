@@ -35,9 +35,9 @@ describe('Auth Routes', () => {
       // This checks that the function was called with an object containing the following properties
       expect(emailService.sendHtmlEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          email: 'test@example.com',
-          x: expect.any(Number),
-          y: expect.any(String),
+          to: 'test@example.com',
+          html: expect.any(String),
+          subject: expect.any(String),
         })
       );
     });
