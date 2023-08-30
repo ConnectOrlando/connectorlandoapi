@@ -115,7 +115,7 @@ describe('Auth Routes', () => {
 
 describe('POST /auth/reset-password', () => {
   const randomUser = {
-    email: 'test@example.com',
+    email: 'randomtest@example.com',
     password: 'testPassword',
   };
   it('should reset the password successfully', async () => {
