@@ -212,7 +212,7 @@ describe('Auth Routes', () => {
       });
 
       it('should return an error for missing email', async () => {
-        const response = await request.post('/forgot-password').send({});
+        const response = await request.post('/auth/forgot-password').send({});
 
         expect(response.status).toBe(400);
         expect(response.body.error.message).toBe('Must provide a valid email');
@@ -221,11 +221,13 @@ describe('Auth Routes', () => {
       it('should return a message for non-existing email', async () => {
         const nonExistingEmail = 'nonexistent@example.com';
         const response = await request
-          .post('/forgot-password')
+          .post('/auth/forgot-password')
           .send({ email: nonExistingEmail });
 
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe('Must provide a valid email');
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe(
+          'Password reset request has been processed.'
+        );
       });
     });
   });
