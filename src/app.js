@@ -14,10 +14,11 @@ export default express()
   .use(cookieParser())
   .use(compression({ filter: shouldCompress }))
   .use(morganMiddleware)
+  .options('*', cors())
   .use(
     cors({
       origin: config.CORS_WHITELIST ?? config.BASE_URL,
-      methods: 'GET,PUT,POST,DELETE',
+      methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
       allowedHeaders: 'Content-Type, Authorization',
     })
   )

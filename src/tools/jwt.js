@@ -38,10 +38,20 @@ export async function verify(token) {
 
 function ensureJWTSecret() {
   if (!config.JWT_SECRET) {
-    Logger.debug(
-      'JWT_SECRET not set in environment variables. Using UNSAFE default.'
-    );
-    if (!['development', 'test', 'ci', 'staging'].includes(config.NODE_ENV)) {
+    const isRunningInSafeEnvironment = [
+      'development',
+      'test',
+      'ci',
+      'staging',
+    ].includes(config.NODE_ENV);
+
+    if (!isRunningInSafeEnvironment) {
+      Logger.debug(
+        'JWT_SECRET not set in environment variables. Using UNSAFE default.'
+      );
+    }
+
+    if (!isRunningInSafeEnvironment) {
       throw new Error(
         'JWT Tool:::JWT_SECRET not set in environment variables. Cannot sign tokens securely.'
       );
