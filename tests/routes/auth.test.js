@@ -207,7 +207,6 @@ describe('Auth Routes', () => {
             password: await bcrypt.hash('testPassword', 10),
           },
         });
-        console.log(user.id);
 
         const refreshToken = await getSignedRefreshToken({
           request: {
@@ -225,10 +224,11 @@ describe('Auth Routes', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Successfully logged out');
+        const refreshTokenInfo = jwt.verify(refreshToken);
 
         const checkToken = await prisma.refreshTokens.findUnique({
           where: {
-            id: refreshToken.refreshTokenId,
+            id: refreshTokenInfo.refreshTokenId,
           },
         });
         expect(checkToken).toBe(null);
