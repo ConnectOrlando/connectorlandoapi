@@ -3,6 +3,7 @@ import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
 import bcrypt from 'bcrypt';
 import jwt from '../../src/tools/jwt.js';
+import { getSignedRefreshToken } from '../../src/services/tokenService.js';
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -197,6 +198,60 @@ describe('Auth Routes', () => {
         'Cannot verify user information'
       );
     });
+    describe('POST /auth/signout', () => {
+      it('should sign out successfully with a valid refresh token', async () => {
+        const user = await prisma.user.create({
+          data: {
+            name: 'logout user',
+            email: 'logout@example.com',
+            password: await bcrypt.hash('testPassword', 10),
+          },
+        });
+        console.log(user.id);
+
+        const refreshToken = await getSignedRefreshToken({
+          request: {
+            headers: {
+              'x-forwarded-for': '123.45.67.89',
+              'user-agent': 'jest-agent',
+            },
+          },
+          user,
+        });
+
+        const response = await request
+          .post('/auth/signout')
+          .send({ refreshToken });
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Successfully logged out');
+
+        const checkToken = await prisma.refreshTokens.findUnique({
+          where: {
+            id: refreshToken.refreshTokenId,
+          },
+        });
+        expect(checkToken).toBe(null);
+      });
+
+      it('should log out successfully even with an invalid refresh token', async () => {
+        const invalidToken = 'invalid-refresh-token';
+
+        const response = await request
+          .post('/auth/signout')
+          .send({ refreshToken: invalidToken });
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Successfully logged out');
+      });
+
+      it('should log out successfully even without providing a refresh token', async () => {
+        const response = await request.post('/auth/signout').send({});
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Successfully logged out');
+      });
+    });
+
     describe('POST /auth/forgot-password', () => {
       it('should send a password reset email for a valid email', async () => {
         const userEmail = 'testuser1@example.com';

@@ -64,9 +64,8 @@ describe('Business Routes', () => {
 
   describe('POST /business', () => {
     it('should create a business', async () => {
-      // this allows us to send a request with a body
       const response = await request.post('/business').send({
-        name: 'Test Business',
+        name: 'new name',
         type: 'Test Type',
         mission: 'Test Mission',
       });
