@@ -224,7 +224,7 @@ describe('Auth Routes', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.message).toBe('Successfully logged out');
-        const refreshTokenInfo = jwt.verify(refreshToken);
+        const refreshTokenInfo = await jwt.verify(refreshToken);
 
         const checkToken = await prisma.refreshTokens.findUnique({
           where: {
