@@ -65,7 +65,7 @@ describe('Business Routes', () => {
   describe('POST /business', () => {
     it('should create a business', async () => {
       const response = await request.post('/business').send({
-        name: 'new name',
+        name: 'Test Business',
         type: 'Test Type',
         mission: 'Test Mission',
       });
