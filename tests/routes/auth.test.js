@@ -3,6 +3,7 @@ import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
 import bcrypt from 'bcrypt';
 import jwt from '../../src/tools/jwt.js';
+import { getSignedRefreshToken } from '../../src/services/tokenService.js';
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -109,6 +110,51 @@ describe('Auth Routes', () => {
       expect(response.status).toBe(200);
       expect(typeof response.body.accessToken).toBe('string');
       expect(typeof response.body.refreshToken).toBe('string');
+    });
+  });
+  describe('POST /auth/refresh', () => {
+    let user;
+    let refreshToken;
+
+    beforeAll(async () => {
+      user = await prisma.user.create({
+        data: {
+          name: 'name',
+          email: 'refresh@example.com',
+          password: await bcrypt.hash('password', 10),
+        },
+      });
+      refreshToken = await getSignedRefreshToken({
+        request: {
+          headers: {
+            'x-forwarded-for': '123.45.67.89',
+            'user-agent': 'jest-agent',
+          },
+        },
+        user,
+      });
+    });
+
+    afterAll(async () => {
+      await prisma.user.delete({ where: { id: user.id } });
+    });
+
+    it('should return a new access token when provided with a valid refresh token', async () => {
+      const response = await request.post('/auth/refresh').send({
+        refreshToken: refreshToken,
+      });
+
+      expect(response.status).toBe(200);
+      expect(typeof response.body.accessToken).toBe('string');
+    });
+
+    it('should return an error when provided with an invalid refresh token', async () => {
+      const response = await request.post('/auth/refresh').send({
+        refreshToken: 'invalid_refresh_token',
+      });
+
+      expect(response.status).toBe(401);
+      expect(response.body.error.message).toBe('Invalid refresh token');
     });
   });
 
