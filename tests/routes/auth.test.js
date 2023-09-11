@@ -3,6 +3,7 @@ import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
 import bcrypt from 'bcrypt';
 import jwt from '../../src/tools/jwt.js';
+import { getSignedRefreshToken } from '../../src/services/tokenService.js';
 const request = supertest(app);
 
 describe('Auth Routes', () => {
@@ -123,7 +124,15 @@ describe('Auth Routes', () => {
           password: await bcrypt.hash('password', 10),
         },
       });
-      refreshToken = await jwt.sign({ email: user.email }, '1w');
+      refreshToken = await getSignedRefreshToken({
+        request: {
+          headers: {
+            'x-forwarded-for': '123.45.67.89',
+            'user-agent': 'jest-agent',
+          },
+        },
+        user,
+      });
     });
 
     afterAll(async () => {
