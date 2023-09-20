@@ -158,4 +158,45 @@ router.post('/forgot-password', async (request, response, next) => {
     response.json({ message: 'Password reset request has been processed.' });
   }
 });
+
+router.post('/reset-password', async (request, response, next) => {
+  const { resetPasswordToken, newPassword } = request.body;
+
+  try {
+    let decodedToken;
+    try {
+      decodedToken = await jwt.verify(resetPasswordToken);
+    } catch {
+      throw new RequestError(
+        'Reset token is invalid or has expired. Please request a new one.'
+      );
+    }
+    const userEmail = decodedToken.email;
+
+    const user = await Prisma.user.findUnique({
+      where: {
+        email: userEmail.toLowerCase(),
+      },
+    });
+
+    if (!user) {
+      throw new RequestError('User not found');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await Prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    response.json({ message: 'Password reset successful' });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
