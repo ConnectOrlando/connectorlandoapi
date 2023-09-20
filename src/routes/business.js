@@ -15,6 +15,9 @@ router.get('/:id', async (request, response, next) => {
       where: {
         id: request.params.id,
       },
+      include: {
+        owner: true,
+      },
     });
     if (!business) {
       throw new RequestError(
@@ -25,8 +28,9 @@ router.get('/:id', async (request, response, next) => {
       throw new ArchivedError('Business account already deleted');
     }
 
-    _.pick(business, ['name', 'email', 'profile']); //etc
-    response.json({ business });
+    const selectedFields = _.pick(business, ['name', 'email', 'profile']);
+
+    response.json({ business: selectedFields });
   } catch (error) {
     next(error);
   }
