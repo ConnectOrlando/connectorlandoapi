@@ -1,9 +1,25 @@
 import supertest from 'supertest';
 import app from '../../src/app.js';
 import prisma from '../../src/tools/prisma.js';
+import { jest } from '@jest/globals';
 import bcrypt from 'bcrypt';
 import jwt from '../../src/tools/jwt.js';
+import emailService from '../../src/services/emailService.js';
+
 const request = supertest(app);
+
+beforeEach(() => {
+  // this mocks the sendHtmlEmail function so that it does not actually send an email
+  emailService.sendHtmlEmail = jest.fn(() => true);
+});
+
+afterEach(() => {
+  // this clears the mock after each test so that it does not interfere with other tests
+  // for example, if you have a test that checks how many times a function was called
+  // and you don't clear the mock, it will interfere with the next test
+  // because the mock will still have the number of times it was called from the previous test
+  jest.clearAllMocks();
+});
 
 describe('Auth Routes', () => {
   describe('POST /auth/signup', () => {
@@ -16,6 +32,15 @@ describe('Auth Routes', () => {
       expect(response.status).toBe(200);
       expect(typeof response.body.accessToken).toBe('string');
       expect(typeof response.body.refreshToken).toBe('string');
+      expect(emailService.sendHtmlEmail).toHaveBeenCalled();
+      // This checks that the function was called with an object containing the following properties
+      expect(emailService.sendHtmlEmail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: 'test@example.com',
+          html: expect.any(String),
+          subject: expect.any(String),
+        })
+      );
     });
 
     it('should require a name', async () => {
