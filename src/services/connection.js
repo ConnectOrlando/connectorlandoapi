@@ -1,13 +1,5 @@
-{
-  ('IsEncrypted');
-  false, 'Values';
-  {
-    ('AzureWebJobsStorage');
-    'DefaultEndpointsProtocol=https;AccountName=uploadimagesample1;AccountKey=rDQAfJJp20EGiOUIhm2DDV8PLo5Dl0+fHtfxOUuS/w1kCw59QbbNBh7oOwdHK9mkZHxBiMXeXrtB+AStb2jdsQ==;EndpointSuffix=core.windows.net',
-      'FUNCTIONS_WORKER_RUNTIME';
-    ('node');
-  }
-}
+('IsEncrypted');
+false, 'Values';
 
 // import {
 //   StorageSharedKeyCredential,
