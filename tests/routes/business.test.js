@@ -105,6 +105,61 @@ describe('Business Routes', () => {
     });
   });
 
+  describe('GET /business/favorites', () => {
+    it('should return error when no authorization header provided', async () => {
+      const response = await request(app).get('/business/favorites');
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({
+        message: 'Access token missing',
+      });
+    });
+
+    it('should return user favorite businesses', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'mockUserId',
+        favorites: [
+          {
+            business: {
+              id: 'business1',
+              name: 'Business 1',
+            },
+          },
+        ],
+      });
+
+      const mockToken = '<YOUR_MOCK_TOKEN>';
+
+      const response = await request(app)
+        .get('/business/favorites')
+        .set('Authorization', `Bearer ${mockToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'business1',
+            name: 'Business 1',
+          }),
+        ])
+      );
+    });
+
+    it('should return error when user not found', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      const mockToken = '<YOUR_MOCK_TOKEN>';
+
+      const response = await request(app)
+        .get('/favorites')
+        .set('Authorization', `Bearer ${mockToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toMatchObject({
+        message: 'Could not find user with id mockUserId',
+      });
+    });
+  });
+
   describe('PATCH /business/:id', () => {
     it('should only update allowed fields', async () => {
       const originalBusiness = await prisma.business.create({
